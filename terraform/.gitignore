@@ -1,0 +1,17 @@
+# Ignorar la carpeta de Terraform que contiene plugins y archivos temporales
+.terraform/
+
+# Ignorar los archivos de estado de Terraform
+terraform.tfstate
+terraform.tfstate.backup
+
+# Ignorar archivos de logs de Terraform
+*.log
+
+# Ignorar credenciales locales si las tienes
+*.tfvars
+*.env
+
+# Ignorar cualquier archivo sensible que no quieras subir
+*.pem
+*.key

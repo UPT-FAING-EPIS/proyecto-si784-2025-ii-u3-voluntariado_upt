@@ -1,0 +1,534 @@
+/* ========================================
+   SISTEMA RSU - UNIVERSIDAD PRIVADA DE TACNA
+   Colores Institucionales: Azul, Amarillo Claro, Blanco
+   ======================================== */
+
+:root {
+    /* Colores Institucionales UPT */
+    --upt-azul-principal: #003366;      /* Azul marino institucional */
+    --upt-azul-secundario: #0066cc;     /* Azul medio */
+    --upt-azul-claro: #4d94ff;          /* Azul claro */
+    --upt-amarillo: #ffcc00;            /* Amarillo institucional */
+    --upt-amarillo-claro: #fff3cd;      /* Amarillo muy claro */
+    --upt-amarillo-suave: #fffacd;      /* Amarillo suave para fondos */
+    --upt-blanco: #ffffff;              /* Blanco puro */
+    --upt-gris-claro: #f8f9fa;          /* Gris muy claro */
+    --upt-gris-medio: #6c757d;          /* Gris medio para textos */
+    --upt-gris-oscuro: #343a40;         /* Gris oscuro */
+    
+    /* Sombras */
+    --sombra-suave: 0 2px 8px rgba(0, 51, 102, 0.1);
+    --sombra-media: 0 4px 12px rgba(0, 51, 102, 0.15);
+    --sombra-fuerte: 0 8px 25px rgba(0, 51, 102, 0.2);
+    
+    /* Gradientes */
+    --gradiente-azul: linear-gradient(135deg, var(--upt-azul-principal) 0%, var(--upt-azul-secundario) 100%);
+    --gradiente-amarillo: linear-gradient(135deg, var(--upt-amarillo) 0%, #ffd633 100%);
+    --gradiente-fondo: linear-gradient(135deg, var(--upt-gris-claro) 0%, var(--upt-amarillo-suave) 100%);
+}
+
+/* Reset y configuración base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--gradiente-fondo);
+    color: var(--upt-gris-oscuro);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ========================================
+   NAVBAR INSTITUCIONAL
+   ======================================== */
+.navbar-upt {
+    background: var(--gradiente-azul);
+    box-shadow: var(--sombra-media);
+    border-bottom: 3px solid var(--upt-amarillo);
+    padding: 0.75rem 0;
+}
+
+.navbar-upt .navbar-brand {
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--upt-blanco) !important;
+    letter-spacing: -0.025em;
+}
+
+.navbar-upt .navbar-brand i {
+    color: var(--upt-amarillo);
+    margin-right: 0.5rem;
+}
+
+.navbar-upt .nav-link {
+    color: var(--upt-blanco) !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.navbar-upt .nav-link:hover {
+    color: var(--upt-amarillo) !important;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: var(--sombra-fuerte);
+    border-radius: 8px;
+    border-top: 3px solid var(--upt-amarillo);
+}
+
+.dropdown-item {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: var(--upt-amarillo-claro);
+    color: var(--upt-azul-principal);
+}
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+   ======================================== */
+.main-container {
+    padding: 2rem 0;
+    min-height: calc(100vh - 140px);
+}
+
+/* ========================================
+   HEADER ADMINISTRATIVO
+   ======================================== */
+.admin-header {
+    background: var(--upt-blanco);
+    border-radius: 15px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--sombra-suave);
+    border-left: 6px solid var(--upt-azul-principal);
+    border-top: 2px solid var(--upt-amarillo);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: var(--upt-amarillo);
+    opacity: 0.1;
+    border-radius: 50%;
+    transform: translate(30px, -30px);
+}
+
+.admin-title {
+    color: var(--upt-azul-principal);
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.admin-subtitle {
+    color: var(--upt-gris-medio);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.fecha-hora {
+    background: var(--upt-amarillo-claro);
+    color: var(--upt-azul-principal);
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    font-weight: 600;
+    border: 2px solid var(--upt-amarillo);
+}
+
+/* ========================================
+   ESTADÍSTICAS DEL SISTEMA
+   ======================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: var(--upt-blanco);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: var(--sombra-suave);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--sombra-fuerte);
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-card.azul { --color: var(--upt-azul-principal); }
+.stat-card.amarillo { --color: var(--upt-amarillo); }
+.stat-card.azul-claro { --color: var(--upt-azul-claro); }
+.stat-card.azul-secundario { --color: var(--upt-azul-secundario); }
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.25rem;
+    color: var(--upt-blanco);
+    position: relative;
+}
+
+.stat-card.azul .stat-icon { 
+    background: var(--gradiente-azul);
+}
+.stat-card.amarillo .stat-icon { 
+    background: var(--gradiente-amarillo);
+    color: var(--upt-azul-principal);
+}
+.stat-card.azul-claro .stat-icon { 
+    background: linear-gradient(135deg, var(--upt-azul-claro) 0%, var(--upt-azul-secundario) 100%);
+}
+.stat-card.azul-secundario .stat-icon { 
+    background: linear-gradient(135deg, var(--upt-azul-secundario) 0%, var(--upt-azul-claro) 100%);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--upt-azul-principal);
+    margin-bottom: 0.25rem;
+    line-height: 1;
+}
+
+.stat-label {
+    color: var(--upt-gris-medio);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ========================================
+   SECCIONES DE FUNCIONALIDADES
+   ======================================== */
+.section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--upt-blanco);
+    border-radius: 12px;
+    box-shadow: var(--sombra-suave);
+    border-left: 5px solid var(--upt-azul-principal);
+}
+
+.section-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--gradiente-azul);
+    color: var(--upt-blanco);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: var(--sombra-suave);
+}
+
+.section-title {
+    color: var(--upt-azul-principal);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin: 0;
+    flex: 1;
+}
+
+.section-badge {
+    background: var(--upt-amarillo);
+    color: var(--upt-azul-principal);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ========================================
+   TARJETAS DE FUNCIONALIDADES
+   ======================================== */
+.function-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.function-card {
+    background: var(--upt-blanco);
+    border-radius: 15px;
+    padding: 2.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--sombra-suave);
+    border: 1px solid #e9ecef;
+    position: relative;
+    overflow: hidden;
+}
+
+.function-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--gradiente-azul);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.function-card::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    width: 100px;
+    height: 100px;
+    background: var(--upt-amarillo);
+    opacity: 0.05;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.function-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--sombra-fuerte);
+    text-decoration: none;
+    color: inherit;
+}
+
+.function-card:hover::before {
+    transform: scaleX(1);
+}
+
+.function-card:hover::after {
+    bottom: -25px;
+    right: -25px;
+    opacity: 0.1;
+}
+
+.function-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--gradiente-azul);
+    color: var(--upt-blanco);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--sombra-suave);
+}
+
+.function-card:hover .function-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: var(--gradiente-amarillo);
+    color: var(--upt-azul-principal);
+}
+
+.function-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--upt-azul-principal);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.function-description {
+    color: var(--upt-gris-medio);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* ========================================
+   BOTONES Y ELEMENTOS INTERACTIVOS
+   ======================================== */
+.btn-upt-primary {
+    background: var(--gradiente-azul);
+    border: none;
+    color: var(--upt-blanco);
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--sombra-suave);
+}
+
+.btn-upt-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-media);
+    color: var(--upt-blanco);
+}
+
+.btn-upt-secondary {
+    background: var(--gradiente-amarillo);
+    border: none;
+    color: var(--upt-azul-principal);
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--sombra-suave);
+}
+
+.btn-upt-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-media);
+    color: var(--upt-azul-principal);
+}
+
+/* ========================================
+   FOOTER INSTITUCIONAL
+   ======================================== */
+.footer-upt {
+    background: var(--gradiente-azul);
+    color: var(--upt-blanco);
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: auto;
+    border-top: 3px solid var(--upt-amarillo);
+}
+
+.footer-upt p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.footer-upt .universidad-logo {
+    color: var(--upt-amarillo);
+    font-weight: 700;
+}
+
+/* ========================================
+   ANIMACIONES Y EFECTOS
+   ======================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-delay-1 { animation-delay: 0.1s; }
+.animate-delay-2 { animation-delay: 0.2s; }
+.animate-delay-3 { animation-delay: 0.3s; }
+.animate-delay-4 { animation-delay: 0.4s; }
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 1rem 0;
+    }
+    
+    .admin-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .admin-title {
+        font-size: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .function-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .function-card {
+        padding: 2rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-header {
+        padding: 1rem;
+    }
+    
+    .function-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+}
+
+/* ========================================
+   UTILIDADES
+   ======================================== */
+.text-upt-azul { color: var(--upt-azul-principal) !important; }
+.text-upt-amarillo { color: var(--upt-amarillo) !important; }
+.bg-upt-azul { background-color: var(--upt-azul-principal) !important; }
+.bg-upt-amarillo { background-color: var(--upt-amarillo) !important; }
+.border-upt-azul { border-color: var(--upt-azul-principal) !important; }
+.border-upt-amarillo { border-color: var(--upt-amarillo) !important; }

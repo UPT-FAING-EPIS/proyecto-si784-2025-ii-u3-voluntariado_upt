@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    
+    <!-- Configuración de sesión -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+    
+    <!-- Servlet de Asistencia -->
+    <servlet>
+        <servlet-name>AsistenciaServlet</servlet-name>
+        <servlet-class>servlet.AsistenciaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AsistenciaServlet</servlet-name>
+        <url-pattern>/AsistenciaServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Servlet de Inscripción -->
+    <servlet>
+        <servlet-name>InscripcionServlet</servlet-name>
+        <servlet-class>servlet.InscripcionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InscripcionServlet</servlet-name>
+        <url-pattern>/InscripcionServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Servlet de QR Code -->
+    <servlet>
+        <servlet-name>QRCodeServlet</servlet-name>
+        <servlet-class>servlet.QRCodeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>QRCodeServlet</servlet-name>
+        <url-pattern>/QRCodeServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Servlet de Certificados -->
+    <servlet>
+        <servlet-name>CertificadoServlet</servlet-name>
+        <servlet-class>servlet.CertificadoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CertificadoServlet</servlet-name>
+        <url-pattern>/CertificadoServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Servlet de Descarga de Certificados PDF -->
+    <servlet>
+        <servlet-name>DescargarCertificadoServlet</servlet-name>
+        <servlet-class>servlet.DescargarCertificadoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DescargarCertificadoServlet</servlet-name>
+        <url-pattern>/DescargarCertificadoServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Servlet de Reporte de Participación -->
+    <servlet>
+        <servlet-name>ReporteParticipacionServlet</servlet-name>
+        <servlet-class>servlet.ReporteParticipacionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReporteParticipacionServlet</servlet-name>
+        <url-pattern>/ReporteParticipacionServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Servlet de Reporte de Asistencia -->
+    <servlet>
+        <servlet-name>ReporteAsistenciaServlet</servlet-name>
+        <servlet-class>servlet.ReporteAsistenciaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReporteAsistenciaServlet</servlet-name>
+        <url-pattern>/ReporteAsistenciaServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Servlet de Reporte General -->
+    <servlet>
+        <servlet-name>ReporteGeneralServlet</servlet-name>
+        <servlet-class>servlet.ReporteGeneralServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReporteGeneralServlet</servlet-name>
+        <url-pattern>/ReporteGeneralServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Página de bienvenida -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>
