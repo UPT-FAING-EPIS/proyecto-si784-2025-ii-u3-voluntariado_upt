@@ -174,7 +174,8 @@ Con su implementación, Voluntariado-UPT busca optimizar la trazabilidad y trans
   1. ## **Restricciones**
      El desarrollo e implementación del sistema **Voluntariado-UPT** presenta ciertas limitaciones técnicas y operativas que deben ser consideradas durante su ciclo de vida. En primer lugar, la infraestructura actual depende de un entorno **local de desarrollo (NetBeans + Tomcat + MySQL)**, lo cual restringe su despliegue inmediato en entornos de producción o nube sin ajustes de configuración adicionales. Asimismo, la ausencia de un mecanismo de autenticación avanzada (como OAuth2 o integración institucional) y la gestión manual de contraseñas reducen temporalmente el nivel de seguridad frente a sistemas de mayor madurez tecnológica.
 
-     Adicionalmente, el uso de librerías con licencias restrictivas —como **iText (AGPL)**— limita su redistribución en entornos externos, lo que requiere evaluar alternativas open source o comerciales para versiones futuras. Finalmente, la infraestructura definida en Terraform contempla recursos en **Google Cloud Firestore**, los cuales aún no están integrados con la aplicación, generando una brecha entre la planificación y la implementación real del sistema.
+     Adicionalmente, el uso de librerías con licencias restrictivas —como **iText (AGPL)**— limita su redistribución en entornos externos, lo que requiere evaluar alternativas open source o comerciales para versiones futuras. Finalmente, la infraestructura definida en Terraform contempla recursos en **Google Cloud Firestore**, los cuales aún no están integrados con la aplicación, generando una brecha entre la planificación y la implementación real del sistema.  
+     
 |**Tipo de Restricción**|**Descripción**|**Impacto**|**Nivel**|
 | - | - | - | - |
 |**Tecnológica**|Dependencia de entorno local (Tomcat/MySQL)|Medio|Moderado|
@@ -412,8 +413,9 @@ El costo principal del proyecto se centra en:
 Como menciona la Ley de Protección de Datos Personales del Perú (Ley N.º 29733) que protege el derecho de las personas a controlar su información personal, estableciendo que deben tener conocimiento de los datos que se recopilan sobre ellas, así como el derecho a corregirlos, eliminarlos y oponerse a su uso. También obliga a las entidades públicas y privadas a adoptar medidas técnicas, administrativas y físicas para proteger estos datos, y define las infracciones y sanciones en caso de incumplimiento. El sistema cumplirá con ello, asegurando la confidencialidad de la información de los estudiantes.
 
 - **Ley N.º 30096 – Ley de Delitos Informáticos**, que regula las responsabilidades sobre uso indebido de información digital.
-- **ISO/IEC 27001:2022**, norma internacional sobre sistemas de gestión de la seguridad de la información.
-|*Alineamiento con las políticas internas de la Universidad Privada de Tacna (UPT)*|El sistema se desarrollará en concordancia con el Reglamento de Seguridad de la Información y las políticas de tratamiento de datos de la Universidad Privada de Tacna (UPT), garantizando que su uso esté autorizado y supervisado por la EPIS. |
+- **ISO/IEC 27001:2022**, norma internacional sobre sistemas de gestión de la seguridad de la información.  
+
+|*Alineamiento con las políticas internas de la Universidad Privada de Tacna (UPT)*|El sistema se desarrollará en concordancia con el Reglamento de Seguridad de la Información y las políticas de tratamiento de datos de la Universidad Privada de Tacna (UPT), garantizando que su uso esté autorizado y supervisado por la EPIS.|
 | :- | - |
 |*Tratamiento limitado y con finalidad específica*|Los datos personales recolectados (nombre, código universitario, correo institucional, etc.) Se utilizarán exclusivamente para fines de gestión de campañas de voluntariado, sin fines comerciales ni transferencia a terceros, en estricto cumplimiento del principio de finalidad establecido en el Artículo 4 de la Ley N.º 29733.|
 |<p><h4>*Derechos ARCO (Acceso, Rectificación, Cancelación y Oposición)*</h4></p><p></p>|La plataforma incluirá funcionalidades que permitan a los titulares de los datos ejercer sus derechos ARCO, tales como consultar sus datos registrados, solicitar correcciones o solicitar la eliminación de su información al finalizar su participación en campañas.|
@@ -484,7 +486,8 @@ Criterios de Inversión
 El valor es muy superior al 15% de tasa de descuento siendo el valor en este caso del 2800%, lo que confirma que el rendimiento del proyecto es atractivo.
 
 1. ### <a name="_heading=h.q10cvovw8h5g"></a>**Punto de Equilibrio y Retorno de Inversión (ROI)**
-   El **punto de equilibrio** se alcanza cuando los beneficios acumulados igualan el costo total del proyecto. Dado el bajo nivel de inversión y el ahorro operativo estimado, se proyecta que el sistema **recupera su inversión en el primer año de funcionamiento**, considerando únicamente los beneficios directos.
+   El **punto de equilibrio** se alcanza cuando los beneficios acumulados igualan el costo total del proyecto. Dado el bajo nivel de inversión y el ahorro operativo estimado, se proyecta que el sistema **recupera su inversión en el primer año de funcionamiento**, considerando únicamente los beneficios directos.  
+
 |**Indicador**|**Fórmula**|**Resultado**|
 | :- | :- | :- |
 |**Inversión Inicial (I)**|Costo total del proyecto|S/ 60.00|
@@ -537,7 +540,7 @@ Asimismo, la participación de estudiantes en su desarrollo refuerza el compromi
 | - | :- |
 |<p>**Propósito del Proyecto y Resultados esperados:** </p><p></p><p>*El propósito del proyecto es **diseñar e implementar un sistema web integral que modernice y optimice la gestión de campañas de voluntariado universitario**, fortaleciendo los procesos de Responsabilidad Social Universitaria (RSU) en la Universidad Privada de Tacna.*</p><p></p><p>Los resultados esperados son:</p><p>- *Un sistema funcional y accesible para la inscripción, control de asistencia mediante códigos QR y emisión de certificados digitales.*</p><p>- *Una base de datos centralizada que garantice la trazabilidad y fiabilidad de la información.*</p><p>- *Reportes automatizados que faciliten la toma de decisiones y la evaluación del impacto social de las campañas.*</p><p></p>||
 |<p></p><p>**Población Objetivo:** </p><p>***Estudiantes voluntarios, coordinadores RSU y administradores** de la Universidad Privada de Tacna, beneficiando indirectamente a las comunidades atendidas por las campañas de voluntariado universitario.*</p><p></p>||
-|<p>**Monto de Inversión (En Soles):**</p><p></p><p>***{  S/. 5,176.50}***</p><p></p>|<p>**Duración del Proyecto (En Meses):**</p><p></p><p>`     `***4 meses (16 semanas académicas)***</p><p></p>|
+|<p>**Monto de Inversión (En Soles):**</p><p></p><p>***S/. 60.00***</p><p></p>|<p>**Duración del Proyecto (En Meses):**</p><p></p><p>`     `***3 meses (12 semanas académicas)***</p><p></p>|
 
 
 
