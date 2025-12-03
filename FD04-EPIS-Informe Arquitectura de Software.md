@@ -1,38 +1,40 @@
-﻿** 		![](./media/Aspose.Words.4ddafea1-fdf3-4bd6-ae8e-00f31d771563.001.png)![](./media/Aspose.Words.4ddafea1-fdf3-4bd6-ae8e-00f31d771563.002.png)
+﻿<center>
 
-![C:\Users\EPIS\Documents\upt.png](./media/Aspose.Words.4ddafea1-fdf3-4bd6-ae8e-00f31d771563.003.png)
+[comment]: <img src="./media/media/image1.png" style="width:1.088in;height:1.46256in" alt="escudo.png" />
 
-**UNIVERSIDAD PRIVADA DE TACNA**
+![./media/media/image1.png](./media/logo-upt.png)
 
-**FACULTAD DE INGENIERÍA**
+## **UNIVERSIDAD PRIVADA DE TACNA**
 
-**Escuela Profesional de Ingeniería de Sistemas**
+## **FACULTAD DE INGENIERIA**
 
-**Proyecto *Implementación de Sistema de Voluntariado UPT***
+## **Escuela Profesional de Ingeniería de Sistemas**<br>
 
+<br>
+
+# **Proyecto *"Implementación de Sistema de Voluntariado UPT"***
+
+<br>
 
 Curso: *Calidad y Pruebas de Software*
 
-
-Docente: *Ing. Mag. Patrick Jose Cuadros Quiroga*
+Docente: *Patrick José Cuadros Quiroga*
 
 
 Integrantes:
 
-***Victor Williams, Cruz Mamani			(2022073903)***
-
-***Diego Fernando, Castillo Mamani		(2022073895)***
-
-***Joan Cristian, Medina Quispe			(2022074255)***
-
-
-
-
-
+***Cruz Mamani, Victor Williams (2022073903)***  
+***Castillo Mamani, Diego Fernando (2022073895)***  
+***Medina Quispe, Joan Cristian (202207394255)***
 
 **Tacna – Perú**
 
-***2025***
+***2025-II***
+
+**  
+**
+</center>
+<div style="page-break-after: always; visibility: hidden">\pagebreak</div>
 
 
 |CONTROL DE VERSIONES||||||
