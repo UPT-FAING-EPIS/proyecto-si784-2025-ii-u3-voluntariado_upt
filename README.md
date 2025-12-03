@@ -79,9 +79,29 @@ Este proyecto implementa un **workflow unificado** de GitHub Actions que ejecuta
    └── Comentario automático en PR
 ```
 
+### 🔒 Reportes de Seguridad en GitHub Pages
+
+[![Security Reports](https://img.shields.io/badge/Security-Reports-blue?style=for-the-badge&logo=github)](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/)
+
+Reportes de análisis de seguridad **publicados automáticamente** en GitHub Pages:
+
+- **🔍 [Semgrep Analysis](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/semgrep/)** - OWASP Top 10, SQL Injection, XSS
+- **🛡️ [Snyk Code Analysis](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/code.html)** - Vulnerabilidades en código fuente
+- **📦 [Snyk Dependencies](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/dependencies.html)** - CVEs en dependencias Maven
+
+Los reportes se actualizan automáticamente:
+- ✅ Después de cada ejecución del workflow principal
+- ✅ Semanalmente (lunes 3 AM UTC)
+- ✅ Manualmente desde GitHub Actions
+
+Ver **[Documentación de GitHub Pages](GITHUB_PAGES_SECURITY_REPORTS.md)** para configuración completa.
+
+---
+
 ### 📚 Documentación de Testing
 
 - **[GitHub Actions Testing Guide](GITHUB_ACTIONS_TESTING.md)** - Guía completa del workflow
+- **[GitHub Pages Security Reports](GITHUB_PAGES_SECURITY_REPORTS.md)** - Sistema de reportes públicos
 - **[Informe Análisis Estático - SonarQube](Informe-Analisis-Estatico-SonarQube.md)**
 - **[Informe Análisis Estático - Semgrep](Informe-Analisis-Estatico-Semgrep.md)**
 - **[Informe Análisis Estático - Snyk](Informe-Analisis-Estatico-Snyk-Parte1.md)** (3 partes)
