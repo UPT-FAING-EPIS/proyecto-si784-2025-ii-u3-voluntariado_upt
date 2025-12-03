@@ -1,0 +1,668 @@
+name: 🔬 Complete Test Suite - Static & Dynamic Analysis
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Ejecutar suite completa todos los días a las 2 AM
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_level:
+        description: 'Nivel de pruebas a ejecutar'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - static-only
+          - dynamic-only
+          - smoke
+          - full-regression
+
+env:
+  JAVA_VERSION: '17'
+  MAVEN_OPTS: -Xmx2048m
+  NODE_VERSION: '18'
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 1: ANÁLISIS ESTÁTICO (Seguridad y Calidad de Código)
+  # ═══════════════════════════════════════════════════════════════════
+  
+  static-analysis:
+    name: 🔍 Static Analysis
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_level != 'dynamic-only'
+    
+    strategy:
+      matrix:
+        tool: ['sonarqube', 'semgrep', 'snyk']
+      fail-fast: false
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for SonarQube
+      
+      - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: maven
+      
+      # ─────────────────────────────────────────────────────────
+      # SONARQUBE ANALYSIS
+      # ─────────────────────────────────────────────────────────
+      - name: 🔍 Run SonarQube Analysis
+        if: matrix.tool == 'sonarqube'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          cd proyecto
+          mvn clean verify sonar:sonar \
+            -Dsonar.projectKey=voluntariado-upt \
+            -Dsonar.organization=upt-epis \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.java.coveragePlugin=jacoco \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+      
+      - name: 📊 SonarQube Quality Gate Check
+        if: matrix.tool == 'sonarqube'
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      
+      # ─────────────────────────────────────────────────────────
+      # SEMGREP ANALYSIS
+      # ─────────────────────────────────────────────────────────
+      - name: 🔍 Run Semgrep Analysis
+        if: matrix.tool == 'semgrep'
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/java
+            p/owasp-top-ten
+            p/security-audit
+            p/sql-injection
+            p/xss
+          generateSarif: true
+      
+      - name: 📤 Upload Semgrep SARIF
+        if: matrix.tool == 'semgrep'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+      
+      # ─────────────────────────────────────────────────────────
+      # SNYK SECURITY SCAN
+      # ─────────────────────────────────────────────────────────
+      - name: 🔍 Run Snyk Security Scan
+        if: matrix.tool == 'snyk'
+        uses: snyk/actions/maven@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --file=proyecto/pom.xml
+      
+      - name: 📤 Upload Snyk Results to GitHub Code Scanning
+        if: matrix.tool == 'snyk'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
+      
+      - name: 📄 Generate Static Analysis Report
+        if: always()
+        run: |
+          mkdir -p reports/static-analysis
+          echo "## ${{ matrix.tool }} Analysis Results" > reports/static-analysis/${{ matrix.tool }}-summary.md
+          echo "**Status:** ${{ job.status }}" >> reports/static-analysis/${{ matrix.tool }}-summary.md
+          echo "**Timestamp:** $(date)" >> reports/static-analysis/${{ matrix.tool }}-summary.md
+      
+      - name: 📤 Upload Static Analysis Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-analysis-${{ matrix.tool }}
+          path: reports/static-analysis/
+          retention-days: 30
+
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 2: PRUEBAS UNITARIAS + COBERTURA
+  # ═══════════════════════════════════════════════════════════════════
+  
+  unit-tests:
+    name: 🧪 Unit Tests + Coverage
+    runs-on: ubuntu-latest
+    needs: static-analysis
+    if: |
+      always() && 
+      (needs.static-analysis.result == 'success' || needs.static-analysis.result == 'skipped') &&
+      github.event.inputs.test_level != 'static-only'
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: 🧪 Run Unit Tests with JaCoCo Coverage
+        run: |
+          cd proyecto
+          mvn clean test \
+            -Dmaven.test.failure.ignore=false \
+            jacoco:report
+      
+      - name: 📊 Generate JaCoCo Coverage Report
+        run: |
+          cd proyecto
+          mvn jacoco:report
+      
+      - name: 📈 Publish Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: proyecto/target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: codecov-unit-tests
+          token: ${{ secrets.CODECOV_TOKEN }}
+      
+      - name: 💬 Comment Coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: proyecto/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 60
+          min-coverage-changed-files: 70
+      
+      - name: 📤 Upload Unit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            proyecto/target/surefire-reports/
+            proyecto/target/site/jacoco/
+          retention-days: 30
+      
+      - name: 📊 Publish Unit Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: proyecto/target/surefire-reports/*.xml
+          check_name: Unit Test Results
+
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 3: MUTATION TESTING (PITest)
+  # ═══════════════════════════════════════════════════════════════════
+  
+  mutation-tests:
+    name: 🧬 Mutation Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    if: |
+      always() && 
+      needs.unit-tests.result == 'success' &&
+      (github.event.inputs.test_level == 'all' || github.event.inputs.test_level == 'full-regression')
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: 🧬 Run PITest Mutation Analysis
+        run: |
+          cd proyecto
+          mvn test-compile org.pitest:pitest-maven:mutationCoverage \
+            -DtargetClasses=negocio.*,servlet.* \
+            -DtargetTests=negocio.*Test,servlet.*Test \
+            -DmutationThreshold=60 \
+            -DcoverageThreshold=70
+      
+      - name: 📤 Upload Mutation Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-test-results
+          path: proyecto/target/pit-reports/
+          retention-days: 30
+
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 4: INTEGRATION TESTS (Testcontainers + MySQL)
+  # ═══════════════════════════════════════════════════════════════════
+  
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    if: |
+      always() && 
+      needs.unit-tests.result == 'success' &&
+      github.event.inputs.test_level != 'static-only'
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: voluntariado_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: 🗄️ Initialize Test Database
+        run: |
+          mysql -h127.0.0.1 -uroot -proot voluntariado_test < base_de_datos/completo.sql
+      
+      - name: 🔗 Run Integration Tests
+        run: |
+          cd proyecto
+          mvn verify -Dskip.unit.tests=true \
+            -Ddb.url=jdbc:mysql://localhost:3306/voluntariado_test \
+            -Ddb.username=root \
+            -Ddb.password=root
+      
+      - name: 📤 Upload Integration Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: proyecto/target/failsafe-reports/
+          retention-days: 30
+      
+      - name: 📊 Publish Integration Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: proyecto/target/failsafe-reports/*.xml
+          check_name: Integration Test Results
+
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 5: UI TESTS (Selenium WebDriver)
+  # ═══════════════════════════════════════════════════════════════════
+  
+  ui-tests:
+    name: 🖥️ UI Tests (Selenium)
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    if: |
+      always() && 
+      needs.integration-tests.result == 'success' &&
+      (github.event.inputs.test_level == 'all' || github.event.inputs.test_level == 'full-regression')
+    
+    strategy:
+      matrix:
+        browser: ['chrome', 'firefox']
+      fail-fast: false
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: voluntariado_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: 🌐 Setup Chrome
+        if: matrix.browser == 'chrome'
+        uses: browser-actions/setup-chrome@v1
+      
+      - name: 🦊 Setup Firefox
+        if: matrix.browser == 'firefox'
+        uses: browser-actions/setup-firefox@v1
+      
+      - name: 🗄️ Initialize Database
+        run: |
+          mysql -h127.0.0.1 -uroot -proot voluntariado_test < base_de_datos/completo.sql
+      
+      - name: 📦 Build Application
+        run: |
+          cd proyecto
+          mvn clean package -DskipTests
+      
+      - name: 🚀 Start Application Server
+        run: |
+          cd proyecto
+          mvn tomcat7:run &
+          echo $! > tomcat.pid
+          sleep 30
+          curl -f http://localhost:8080/voluntariado/ || exit 1
+      
+      - name: 🖥️ Run UI Tests - ${{ matrix.browser }}
+        run: |
+          cd proyecto
+          mvn test -Dtest=ui.**.*Test \
+            -Dbrowser=${{ matrix.browser }} \
+            -Dheadless=true \
+            -DscreenshotOnFailure=true
+      
+      - name: 🛑 Stop Application Server
+        if: always()
+        run: |
+          if [ -f proyecto/tomcat.pid ]; then
+            kill $(cat proyecto/tomcat.pid) || true
+          fi
+      
+      - name: 📸 Upload Screenshots (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-screenshots-${{ matrix.browser }}
+          path: proyecto/target/screenshots/
+          retention-days: 7
+      
+      - name: 📤 Upload UI Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-results-${{ matrix.browser }}
+          path: |
+            proyecto/target/surefire-reports/
+            proyecto/target/testng-reports/
+          retention-days: 30
+
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 6: BDD TESTS (Cucumber + Gherkin)
+  # ═══════════════════════════════════════════════════════════════════
+  
+  bdd-tests:
+    name: 🥒 BDD Tests (Cucumber)
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    if: |
+      always() && 
+      needs.integration-tests.result == 'success' &&
+      (github.event.inputs.test_level == 'all' || github.event.inputs.test_level == 'full-regression')
+    
+    strategy:
+      matrix:
+        suite: ['smoke', 'regression']
+      fail-fast: false
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: voluntariado_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: 🌐 Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+      
+      - name: 🗄️ Initialize Database
+        run: |
+          mysql -h127.0.0.1 -uroot -proot voluntariado_test < base_de_datos/completo.sql
+      
+      - name: 📦 Build & Start Application
+        run: |
+          cd proyecto
+          mvn clean package -DskipTests
+          mvn tomcat7:run &
+          sleep 30
+          curl -f http://localhost:8080/voluntariado/ || exit 1
+      
+      - name: 🥒 Run BDD Tests - ${{ matrix.suite }}
+        run: |
+          cd proyecto
+          if [ "${{ matrix.suite }}" == "smoke" ]; then
+            mvn test -Dtest=SmokeTestRunner -Dheadless=true
+          else
+            mvn test -Dtest=RegressionTestRunner -Dheadless=true
+          fi
+      
+      - name: 📊 Generate Cucumber HTML Report
+        if: always()
+        run: |
+          cd proyecto
+          mvn verify -DskipTests
+      
+      - name: 📤 Upload BDD Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bdd-test-results-${{ matrix.suite }}
+          path: |
+            proyecto/target/cucumber-reports/
+            proyecto/target/screenshots/
+          retention-days: 30
+
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 7: CONSOLIDAR Y PUBLICAR RESULTADOS
+  # ═══════════════════════════════════════════════════════════════════
+  
+  consolidate-results:
+    name: 📊 Consolidate & Publish Results
+    runs-on: ubuntu-latest
+    needs: [static-analysis, unit-tests, mutation-tests, integration-tests, ui-tests, bdd-tests]
+    if: always()
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: 📥 Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-test-results
+      
+      - name: 📊 Generate Consolidated Report
+        run: |
+          mkdir -p consolidated-reports
+          
+          # Crear resumen en Markdown
+          cat > consolidated-reports/TEST_SUMMARY.md << 'EOF'
+          # 🔬 Consolidated Test Results
+          
+          **Workflow Run:** ${{ github.run_number }}  
+          **Branch:** ${{ github.ref_name }}  
+          **Commit:** ${{ github.sha }}  
+          **Triggered by:** ${{ github.actor }}  
+          **Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          
+          ## 📋 Test Suite Summary
+          
+          | Stage | Status | Details |
+          |-------|--------|---------|
+          | 🔍 Static Analysis | ${{ needs.static-analysis.result }} | SonarQube, Semgrep, Snyk |
+          | 🧪 Unit Tests | ${{ needs.unit-tests.result }} | JUnit + JaCoCo Coverage |
+          | 🧬 Mutation Tests | ${{ needs.mutation-tests.result }} | PITest |
+          | 🔗 Integration Tests | ${{ needs.integration-tests.result }} | Testcontainers + MySQL |
+          | 🖥️ UI Tests | ${{ needs.ui-tests.result }} | Selenium (Chrome + Firefox) |
+          | 🥒 BDD Tests | ${{ needs.bdd-tests.result }} | Cucumber + Gherkin |
+          
+          ## 📈 Coverage Metrics
+          
+          - **Unit Test Coverage:** Available in JaCoCo report
+          - **Mutation Score:** Available in PITest report
+          - **Integration Coverage:** Available in Failsafe report
+          
+          ## 🔗 Detailed Reports
+          
+          - [View All Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - [SonarQube Dashboard](${{ secrets.SONAR_HOST_URL }}/dashboard?id=voluntariado-upt)
+          - [Codecov Report](https://codecov.io/gh/${{ github.repository }})
+          
+          EOF
+      
+      - name: 📤 Upload Consolidated Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: consolidated-test-report
+          path: consolidated-reports/
+          retention-days: 90
+      
+      - name: 💬 Comment PR with Consolidated Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('consolidated-reports/TEST_SUMMARY.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+      
+      - name: 📊 Create Job Summary
+        if: always()
+        run: |
+          cat consolidated-reports/TEST_SUMMARY.md >> $GITHUB_STEP_SUMMARY
+      
+      - name: ✅ Mark Workflow as Success
+        if: |
+          needs.static-analysis.result == 'success' &&
+          needs.unit-tests.result == 'success' &&
+          needs.integration-tests.result == 'success'
+        run: echo "✅ All critical tests passed!"
+      
+      - name: ⚠️ Mark Workflow with Warnings
+        if: |
+          needs.mutation-tests.result == 'failure' ||
+          needs.ui-tests.result == 'failure' ||
+          needs.bdd-tests.result == 'failure'
+        run: |
+          echo "⚠️ Some non-critical tests failed"
+          exit 0
+      
+      - name: ❌ Mark Workflow as Failed
+        if: |
+          needs.static-analysis.result == 'failure' ||
+          needs.unit-tests.result == 'failure' ||
+          needs.integration-tests.result == 'failure'
+        run: |
+          echo "❌ Critical tests failed!"
+          exit 1
+
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 8: NOTIFICACIONES (Opcional)
+  # ═══════════════════════════════════════════════════════════════════
+  
+  notifications:
+    name: 📢 Send Notifications
+    runs-on: ubuntu-latest
+    needs: consolidate-results
+    if: always() && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: 📧 Send Email Notification (on failure)
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Test Suite Failed - ${{ github.repository }}"
+          body: |
+            Test suite failed for commit ${{ github.sha }}
+            
+            Branch: ${{ github.ref_name }}
+            Workflow: ${{ github.workflow }}
+            Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          to: qa-team@upt.edu.pe
+          from: github-actions@upt.edu.pe
+      
+      - name: 💬 Send Slack Notification
+        if: always()
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "🔬 Test Suite Complete",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Test Suite:* ${{ github.workflow }}\n*Status:* ${{ job.status }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Results"
+                      },
+                      "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

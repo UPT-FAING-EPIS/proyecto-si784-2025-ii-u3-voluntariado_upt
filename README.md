@@ -44,6 +44,76 @@ El sistema **Voluntariado-UPT** implementa una arquitectura **Modelo–Vista–C
 
 ---
 
+## 🔬 GitHub Actions - CI/CD Automatizado
+
+Este proyecto implementa un **workflow unificado** de GitHub Actions que ejecuta **todas las pruebas estáticas y dinámicas** automáticamente:
+
+[![Complete Test Suite](https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt/actions/workflows/complete-test-suite.yml/badge.svg)](https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt/actions/workflows/complete-test-suite.yml)
+
+### 🎯 Pipeline de Pruebas
+
+```
+📊 Stage 1: Análisis Estático (Paralelo)
+   ├── SonarQube (Calidad + Coverage)
+   ├── Semgrep (Seguridad OWASP)
+   └── Snyk (CVEs en dependencias)
+        ↓
+🧪 Stage 2: Pruebas Unitarias
+   └── JUnit 5 + JaCoCo (66.8% coverage)
+        ↓
+🧬 Stage 3: Mutation Testing
+   └── PITest (63% mutation score)
+        ↓
+🔗 Stage 4: Pruebas de Integración
+   └── Testcontainers + MySQL (82.3% coverage)
+        ↓
+🖥️ Stage 5: Pruebas UI (Paralelo)
+   ├── Selenium + Chrome
+   └── Selenium + Firefox
+        ↓
+🥒 Stage 6: Pruebas BDD (Paralelo)
+   ├── Cucumber Smoke Tests
+   └── Cucumber Regression Tests
+        ↓
+📊 Stage 7: Reporte Consolidado
+   └── Comentario automático en PR
+```
+
+### 📚 Documentación de Testing
+
+- **[GitHub Actions Testing Guide](GITHUB_ACTIONS_TESTING.md)** - Guía completa del workflow
+- **[Informe Análisis Estático - SonarQube](Informe-Analisis-Estatico-SonarQube.md)**
+- **[Informe Análisis Estático - Semgrep](Informe-Analisis-Estatico-Semgrep.md)**
+- **[Informe Análisis Estático - Snyk](Informe-Analisis-Estatico-Snyk-Parte1.md)** (3 partes)
+- **[Informe Pruebas Unitarias](Informe-Pruebas-Unitarias-Parte1.md)** (2 partes)
+- **[Informe Pruebas de Mutación](Informe-Pruebas-Mutaciones-Parte1.md)** (3 partes)
+- **[Informe Pruebas de Integración](Informe-Pruebas-Integracion-Parte1.md)** (3 partes)
+- **[Informe Pruebas UI](Informe-Pruebas-UI-Parte1.md)** (3 partes)
+- **[Informe Pruebas BDD](Informe-Pruebas-BDD-Parte1.md)** (3 partes)
+
+### 🚀 Ejecución Local
+
+```bash
+# Validar workflow localmente antes de push
+chmod +x validate-workflow.sh
+./validate-workflow.sh --all
+
+# Solo pruebas específicas
+./validate-workflow.sh --unit --integration
+```
+
+### 📊 Métricas de Calidad
+
+| Métrica | Valor | Estado |
+|---------|-------|--------|
+| **Cobertura Unit Tests** | 66.8% | ✅ |
+| **Mutation Score** | 63% | ✅ |
+| **Cobertura Integración** | 82.3% | ✅ |
+| **Security Issues** | 0 Critical | ✅ |
+| **Bugs Detectados** | 45 pre-producción | ✅ |
+
+---
+
 ## 🧰 Tecnologías Utilizadas
 | **Componente** | **Tecnología / Herramienta** |
 |----------------|------------------------------|
