@@ -48,6 +48,15 @@ jobs:
         with:
           fetch-depth: 0  # Full history for SonarQube
       
+      - name: 🔍 Debug - List files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Listing repository contents:"
+          ls -la
+          echo "Looking for pom.xml files:"
+          find . -name "pom.xml" -type f
+      
       - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
