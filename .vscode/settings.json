@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "upt-epis",
+        "projectKey": "upt-epis_voluntariado-upt"
+    }
+}

@@ -128,6 +128,34 @@ Integrantes:
 
 [**Escenario de mantenibilidad	27**](#_heading=h.j1kcjg5vzjcj)
 
+[***5.***](#_heading=h.reportes_pruebas)[	](#_heading=h.reportes_pruebas)[***REPORTES DE PRUEBAS Y ANÁLISIS DE CALIDAD	28***](#_heading=h.reportes_pruebas)
+
+[**5.1.	Dashboard Principal de Reportes	28**](#_heading=h.reportes_pruebas)
+
+[**5.2.	Análisis Estático de Código	28**](#_heading=h.reportes_pruebas)
+
+[5.2.1.	SonarQube - Análisis de Calidad y Cobertura	28](#_heading=h.reportes_pruebas)
+
+[5.2.2.	Semgrep - Análisis de Seguridad OWASP	29](#_heading=h.reportes_pruebas)
+
+[5.2.3.	Snyk - Análisis de Vulnerabilidades (CVEs)	29](#_heading=h.reportes_pruebas)
+
+[**5.3.	Pruebas Unitarias	29**](#_heading=h.reportes_pruebas)
+
+[**5.4.	Pruebas de Mutación	30**](#_heading=h.reportes_pruebas)
+
+[**5.5.	Pruebas de Integración	30**](#_heading=h.reportes_pruebas)
+
+[**5.6.	Pruebas de Interfaz de Usuario (UI)	30**](#_heading=h.reportes_pruebas)
+
+[**5.7.	Pruebas de Comportamiento (BDD)	31**](#_heading=h.reportes_pruebas)
+
+[**5.8.	Pipeline CI/CD Automatizado	31**](#_heading=h.reportes_pruebas)
+
+[**5.9.	Tabla Resumen de Métricas de Calidad	32**](#_heading=h.reportes_pruebas)
+
+[**5.10.	Actualización de Reportes	32**](#_heading=h.reportes_pruebas)
+
 
 
 
@@ -420,6 +448,160 @@ La Vista de Despliegue (o Física) ilustra la topología de hardware sobre la cu
 - La Base de Datos (añadir la columna en MySQL).
 - La Vista (añadir el campo de texto en crearCampania.jsp).
 - El Controlador (actualizar el Servlet para leer el nuevo parámetro)
+
+1. # <a name="_heading=h.reportes_pruebas"></a>**REPORTES DE PRUEBAS Y ANÁLISIS DE CALIDAD**
+
+Esta sección presenta los enlaces a todos los reportes de pruebas y análisis de calidad realizados al sistema **Voluntariado-UPT**, los cuales se encuentran publicados en **GitHub Pages** para su acceso público y seguimiento continuo.
+
+## 5.1. Dashboard Principal de Reportes
+
+Todos los reportes de análisis de seguridad y pruebas están disponibles públicamente en:
+
+🌐 **[Dashboard de Reportes - GitHub Pages](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/)**
+
+[![Security Reports](https://img.shields.io/badge/Security-Reports-blue?style=for-the-badge&logo=github)](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/)
+
+## 5.2. Análisis Estático de Código
+
+### 5.2.1. SonarQube - Análisis de Calidad y Cobertura
+
+**Enlace al Reporte:** [Informe Análisis Estático - SonarQube](./Informe%20-%20Analisis%20Estatico%20detallado%20(Sonar_Semgrep_Snyk)/Informe-Analisis-Estatico-SonarQube.md)
+
+**Descripción:** Análisis completo de calidad de código, detectando code smells, bugs, vulnerabilidades de seguridad y calculando la cobertura de código mediante JaCoCo.
+
+**Métricas clave:**
+- Bugs detectados: 0
+- Code Smells: 45
+- Vulnerabilidades de Seguridad: 0 críticas
+- Cobertura de Código: 66.8%
+
+### 5.2.2. Semgrep - Análisis de Seguridad OWASP
+
+**Enlace al Reporte:** 
+- [Informe Análisis Estático - Semgrep](./Informe%20-%20Analisis%20Estatico%20detallado%20(Sonar_Semgrep_Snyk)/Informe-Analisis-Estatico-Semgrep.md)
+- [Reporte HTML en GitHub Pages](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/semgrep/)
+
+**Descripción:** Análisis de seguridad basado en reglas OWASP Top 10, detección de SQL Injection, XSS, y otras vulnerabilidades comunes en aplicaciones web.
+
+### 5.2.3. Snyk - Análisis de Vulnerabilidades (CVEs)
+
+**Enlaces a los Reportes:**
+- [Informe Snyk - Parte 1](./Informe%20-%20Analisis%20Estatico%20detallado%20(Sonar_Semgrep_Snyk)/Informe-Analisis-Estatico-Snyk-Parte1.md)
+- [Informe Snyk - Parte 2](./Informe%20-%20Analisis%20Estatico%20detallado%20(Sonar_Semgrep_Snyk)/Informe-Analisis-Estatico-Snyk-Parte2.md)
+- [Informe Snyk - Parte 3](./Informe%20-%20Analisis%20Estatico%20detallado%20(Sonar_Semgrep_Snyk)/Informe-Analisis-Estatico-Snyk-Parte3.md)
+- [Reporte Snyk Code en GitHub Pages](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/code.html)
+- [Reporte Snyk Dependencies en GitHub Pages](https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/dependencies.html)
+
+**Descripción:** Análisis de vulnerabilidades conocidas (CVEs) en dependencias Maven y código fuente, con severidad y recomendaciones de mitigación.
+
+## 5.3. Pruebas Unitarias
+
+**Enlaces a los Reportes:**
+- [Informe Pruebas Unitarias - Parte 1](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-Unitarias-Parte1.md)
+- [Informe Pruebas Unitarias - Parte 2](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-Unitarias-Parte2.md)
+
+**Descripción:** Pruebas unitarias ejecutadas con JUnit 5 + JaCoCo, verificando el comportamiento de componentes individuales del sistema (servlets, lógica de negocio, DAOs).
+
+**Métricas clave:**
+- Cobertura de líneas: 66.8%
+- Cobertura de ramas: 58.2%
+- Total de tests: 89 (87 passed, 2 skipped)
+
+## 5.4. Pruebas de Mutación
+
+**Enlaces a los Reportes:**
+- [Informe Pruebas de Mutación - Parte 1](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-Mutaciones-Parte1.md)
+- [Informe Pruebas de Mutación - Parte 2](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-Mutaciones-Parte2.md)
+- [Informe Pruebas de Mutación - Parte 3](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-Mutaciones-Parte3.md)
+
+**Descripción:** Pruebas de mutación con PITest para evaluar la efectividad de las pruebas unitarias mediante la introducción de mutantes en el código.
+
+**Métricas clave:**
+- Mutation Score: 63%
+- Mutantes generados: 458
+- Mutantes eliminados: 289
+- Mutantes supervivientes: 169
+
+## 5.5. Pruebas de Integración
+
+**Enlaces a los Reportes:**
+- [Informe Pruebas de Integración - Parte 1](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-Integracion-Parte1.md)
+- [Informe Pruebas de Integración - Parte 2](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-Integracion-Parte2.md)
+- [Informe Pruebas de Integración - Parte 3](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-Integracion-Parte3.md)
+
+**Descripción:** Pruebas de integración con Testcontainers + MySQL, verificando la interacción entre capas (servlets, lógica de negocio, base de datos) en un entorno controlado.
+
+**Métricas clave:**
+- Cobertura de integración: 82.3%
+- Tests ejecutados: 45
+- Integración con contenedores Docker automáticos
+
+## 5.6. Pruebas de Interfaz de Usuario (UI)
+
+**Enlaces a los Reportes:**
+- [Informe Pruebas UI - Parte 1](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-UI-Parte1.md)
+- [Informe Pruebas UI - Parte 2](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-UI-Parte2.md)
+- [Informe Pruebas UI - Parte 3](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-UI-Parte3.md)
+
+**Descripción:** Pruebas automatizadas de interfaz de usuario con Selenium WebDriver en navegadores Chrome y Firefox, verificando flujos críticos de usuario (login, inscripciones, asistencia, certificados).
+
+**Navegadores testeados:**
+- Google Chrome (headless)
+- Mozilla Firefox (headless)
+
+## 5.7. Pruebas de Comportamiento (BDD)
+
+**Enlaces a los Reportes:**
+- [Informe Pruebas BDD - Parte 1](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-BDD-Parte1.md)
+- [Informe Pruebas BDD - Parte 2](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-BDD-Parte2.md)
+- [Informe Pruebas BDD - Parte 3](./Informe%20-%20Reportes%20de%20Pruebas%20Automatizadas%20(Unitarias_Mutaciones_Integraci%C3%B3n_Interfaz%20de%20Usuario_BDD)/Informe-Pruebas-BDD-Parte3.md)
+
+**Descripción:** Pruebas de comportamiento (Behavior-Driven Development) con Cucumber, ejecutando escenarios escritos en lenguaje Gherkin que describen las funcionalidades desde la perspectiva del usuario.
+
+**Tipos de pruebas:**
+- Smoke Tests: Verificación de funcionalidades críticas
+- Regression Tests: Suite completa de escenarios de usuario
+
+## 5.8. Pipeline CI/CD Automatizado
+
+El proyecto implementa un workflow unificado de GitHub Actions que ejecuta automáticamente todas las pruebas:
+
+[![Complete Test Suite](https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt/actions/workflows/complete-test-suite.yml/badge.svg)](https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt/actions/workflows/complete-test-suite.yml)
+
+**Pipeline de pruebas:**
+1. **Análisis Estático** (Paralelo): SonarQube, Semgrep, Snyk
+2. **Pruebas Unitarias**: JUnit 5 + JaCoCo
+3. **Mutation Testing**: PITest
+4. **Pruebas de Integración**: Testcontainers + MySQL
+5. **Pruebas UI** (Paralelo): Selenium Chrome + Firefox
+6. **Pruebas BDD** (Paralelo): Cucumber Smoke + Regression
+7. **Reporte Consolidado**: Comentario automático en PR
+
+**Documentación adicional:**
+- [Guía GitHub Actions Testing](./GITHUB_ACTIONS_TESTING.md)
+- [Configuración GitHub Pages](./GITHUB_PAGES_SECURITY_REPORTS.md)
+- [Scripts de Validación](./validate-workflow.sh)
+
+## 5.9. Tabla Resumen de Métricas de Calidad
+
+| Tipo de Prueba | Métrica | Valor | Estado |
+|----------------|---------|-------|--------|
+| **Pruebas Unitarias** | Cobertura de código | 66.8% | ✅ |
+| **Pruebas de Mutación** | Mutation Score | 63% | ✅ |
+| **Pruebas de Integración** | Cobertura de integración | 82.3% | ✅ |
+| **Análisis de Seguridad** | Vulnerabilidades críticas | 0 | ✅ |
+| **Análisis Estático** | Bugs detectados pre-producción | 45 | ✅ |
+| **Pruebas UI** | Navegadores testeados | 2 (Chrome, Firefox) | ✅ |
+| **Pruebas BDD** | Escenarios ejecutados | 28 | ✅ |
+
+## 5.10. Actualización de Reportes
+
+Los reportes de seguridad en GitHub Pages se actualizan automáticamente:
+- ✅ Después de cada ejecución exitosa del workflow principal
+- ✅ Semanalmente (lunes 3 AM UTC) para escaneo programado
+- ✅ Manualmente desde GitHub Actions cuando sea necesario
+
+Esta arquitectura de pruebas garantiza la calidad continua del sistema **Voluntariado-UPT**, proporcionando visibilidad completa sobre el estado de seguridad, calidad de código y funcionalidad del sistema en todo momento.
 
 [ref1]: ./media/Aspose.Words.4ddafea1-fdf3-4bd6-ae8e-00f31d771563.009.jpeg
 [ref2]: ./media/Aspose.Words.4ddafea1-fdf3-4bd6-ae8e-00f31d771563.010.jpeg
