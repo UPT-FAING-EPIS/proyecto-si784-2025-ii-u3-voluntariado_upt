@@ -54,6 +54,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'proyecto/pom.xml'
       
       # ─────────────────────────────────────────────────────────
       # SONARQUBE ANALYSIS
@@ -158,6 +159,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'proyecto/pom.xml'
       
       - name: 🧪 Run Unit Tests with JaCoCo Coverage
         run: |
@@ -228,6 +230,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'proyecto/pom.xml'
       
       - name: 🧬 Run PITest Mutation Analysis
         run: |
@@ -283,6 +286,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'proyecto/pom.xml'
       
       - name: 🗄️ Initialize Test Database
         run: |
@@ -353,6 +357,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'proyecto/pom.xml'
       
       - name: 🌐 Setup Chrome
         if: matrix.browser == 'chrome'
@@ -454,6 +459,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'proyecto/pom.xml'
       
       - name: 🌐 Setup Chrome
         uses: browser-actions/setup-chrome@v1
