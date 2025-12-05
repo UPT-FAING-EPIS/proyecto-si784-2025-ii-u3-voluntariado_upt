@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snyk Dependency Vulnerabilities Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1em; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .stat-number { font-size: 3em; font-weight: bold; margin-bottom: 10px; }
+        .stat-label { color: #666; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
+        .critical { color: #8b0000; }
+        .high { color: #dc3545; }
+        .medium { color: #ffc107; }
+        .low { color: #17a2b8; }
+        .results { padding: 30px; }
+        .result-item {
+            background: #f8f9fa;
+            border-left: 4px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .result-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        .result-item.critical { border-left-color: #8b0000; background: #fff0f0; }
+        .result-item.high { border-left-color: #dc3545; background: #fff5f5; }
+        .result-item.medium { border-left-color: #ffc107; background: #fffbf0; }
+        .result-item.low { border-left-color: #17a2b8; background: #f0f9ff; }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .result-title { font-size: 1.2em; font-weight: 600; color: #2c3e50; }
+        .result-severity {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .severity-critical { background: #8b0000; color: white; }
+        .severity-high { background: #dc3545; color: white; }
+        .severity-medium { background: #ffc107; color: #333; }
+        .severity-low { background: #17a2b8; color: white; }
+        .result-description { color: #555; line-height: 1.6; margin-bottom: 15px; }
+        .result-info {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .info-item { margin-bottom: 8px; }
+        .info-label { font-weight: bold; color: #667eea; }
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .back-button {
+            display: inline-block;
+            margin: 20px;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        .back-button:hover { background: #764ba2; }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #28a745;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Snyk Dependency Vulnerabilities</h1>
+            <p>Sistema de Voluntariado UPT - Análisis de Dependencias</p>
+            <p>Generado: 2025-12-05 11:05:51 UTC</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number critical">0</div>
+                <div class="stat-label">Críticas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number high">0</div>
+                <div class="stat-label">Altas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number medium">0</div>
+                <div class="stat-label">Medias</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number low">0</div>
+                <div class="stat-label">Bajas</div>
+            </div>
+        </div>
+        
+        <a href="../index.html" class="back-button">← Volver al Dashboard</a>
+        
+        <div class="results">
+<div class="no-results">✅ ¡Excelente! No se encontraron vulnerabilidades en las dependencias.</div>
+        </div>
+        
+        <div class="footer">
+            <p>Reportes generados automáticamente por GitHub Actions</p>
+            <p>Universidad Privada de Tacna - FAING EPIS</p>
+        </div>
+    </div>
+</body>
+</html>

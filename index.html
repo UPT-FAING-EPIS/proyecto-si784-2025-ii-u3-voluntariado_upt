@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Reports Dashboard - Sistema Voluntariado UPT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .header .subtitle {
+            font-size: 1em;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .card-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        .card-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .card-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .card-link {
+            display: block;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+            transition: opacity 0.3s;
+            font-weight: 500;
+        }
+        .card-link:hover {
+            opacity: 0.9;
+        }
+        .card-link.secondary {
+            background: #f8f9fa;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+        .info-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .info-section p {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        .info-section ul {
+            margin-left: 20px;
+            color: #666;
+            line-height: 1.8;
+        }
+        .info-section ul li {
+            margin-bottom: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .badge-auto {
+            background: #28a745;
+            color: white;
+        }
+        .badge-weekly {
+            background: #17a2b8;
+            color: white;
+        }
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            opacity: 0.9;
+        }
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Security Reports Dashboard</h1>
+            <p>Sistema de Voluntariado UPT</p>
+            <p class="subtitle">Análisis automatizado de seguridad y calidad de código</p>
+            <div style="margin-top: 20px;">
+                <span class="badge badge-auto">Actualización Automática</span>
+                <span class="badge badge-weekly">Escaneo Semanal</span>
+            </div>
+        </div>
+        
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">🔍</div>
+                <div class="card-title">Semgrep Analysis</div>
+                <div class="card-description">
+                    Análisis estático de código con reglas de seguridad OWASP Top 10, 
+                    SQL Injection, XSS, y mejores prácticas de Java.
+                </div>
+                <div class="card-links">
+                    <a href="semgrep/index.html" class="card-link">Ver Reporte HTML</a>
+                    <a href="semgrep/semgrep-results.sarif" class="card-link secondary">Descargar SARIF</a>
+                    <a href="semgrep/semgrep-results.json" class="card-link secondary">Descargar JSON</a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">🛡️</div>
+                <div class="card-title">Snyk Code Analysis</div>
+                <div class="card-description">
+                    Análisis de vulnerabilidades en el código fuente con detección 
+                    de patrones inseguros y recomendaciones de remediación.
+                </div>
+                <div class="card-links">
+                    <a href="snyk/code.html" class="card-link">Ver Reporte HTML</a>
+                    <a href="snyk/snyk-code-results.sarif" class="card-link secondary">Descargar SARIF</a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">📦</div>
+                <div class="card-title">Snyk Dependencies</div>
+                <div class="card-description">
+                    Análisis de vulnerabilidades conocidas (CVEs) en las dependencias 
+                    del proyecto con severidad y enlaces a parches.
+                </div>
+                <div class="card-links">
+                    <a href="snyk/dependencies.html" class="card-link">Ver Reporte HTML</a>
+                    <a href="snyk/snyk-test-results.json" class="card-link secondary">Descargar JSON</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h2>ℹ️ Acerca de estos reportes</h2>
+            <p><strong>Generación automática:</strong> Estos reportes se generan automáticamente mediante GitHub Actions cada vez que:</p>
+            <ul>
+                <li>Se completa el workflow "Complete Test Suite" en la rama <code>main</code></li>
+                <li>Se ejecuta manualmente desde la pestaña Actions</li>
+                <li>Cada lunes a las 3 AM UTC (escaneo semanal programado)</li>
+            </ul>
+            
+            <p><strong>Herramientas utilizadas:</strong></p>
+            <ul>
+                <li><strong>Semgrep:</strong> Análisis estático de código con reglas personalizables (OWASP, security-audit, java)</li>
+                <li><strong>Snyk Code:</strong> Detección de vulnerabilidades en código fuente con contexto y remediación</li>
+                <li><strong>Snyk Open Source:</strong> Escaneo de dependencias Maven para CVEs conocidos</li>
+            </ul>
+            
+            <p><strong>Repositorio:</strong> <a href="https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt" target="_blank">UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt</a></p>
+        </div>
+        
+        <div class="footer">
+            <p>Universidad Privada de Tacna - Facultad de Ingeniería</p>
+            <p>Escuela Profesional de Ingeniería de Sistemas</p>
+            <p>Curso: Calidad y Pruebas de Software</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                Última actualización: <span id="last-update"></span>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Mostrar fecha de última actualización
+        document.getElementById('last-update').textContent = new Date().toLocaleString('es-PE', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    </script>
+</body>
+</html>

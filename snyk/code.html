@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snyk Code Security Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            color: #666;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .note { color: #17a2b8; }
+        .results {
+            padding: 30px;
+        }
+        .result-item {
+            background: #f8f9fa;
+            border-left: 4px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .result-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        .result-item.error {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        .result-item.warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+        .result-item.note {
+            border-left-color: #17a2b8;
+            background: #f0f9ff;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .result-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .result-severity {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .severity-error {
+            background: #dc3545;
+            color: white;
+        }
+        .severity-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .severity-note {
+            background: #17a2b8;
+            color: white;
+        }
+        .result-message {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .result-location {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        .location-path {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .location-line {
+            color: #666;
+        }
+        .code-snippet {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .back-button {
+            display: inline-block;
+            margin: 20px;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        .back-button:hover {
+            background: #764ba2;
+        }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #28a745;
+            font-size: 1.5em;
+        }
+        .no-results svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Snyk Code Security Report</h1>
+            <p>Sistema de Voluntariado UPT - Análisis de Seguridad</p>
+            <p>Generado: 2025-12-05 11:05:51 UTC</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number error">16</div>
+                <div class="stat-label">Errores Críticos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number warning">50</div>
+                <div class="stat-label">Advertencias</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number note">2</div>
+                <div class="stat-label">Notas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">68</div>
+                <div class="stat-label">Total Issues</div>
+            </div>
+        </div>
+        
+        <a href="../index.html" class="back-button">← Volver al Dashboard</a>
+        
+        <div class="results">
+
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#1: java/HttpResponseSplitting</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into setHeader and reaches an HTTP header returned to the user. This may allow a malicious input that contain CR/LF to split the http response into two responses and the second response to be controlled by the attacker. This may be used to mount a range of attacks such as cross-site scripting or cache poisoning.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 src/java/servlet/DescargarCertificadoServlet.java</div>
+                    <div class="location-line">📍 Línea 74</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item note">
+                <div class="result-header">
+                    <div class="result-title">#2: java/NoHardcodedCredentials</div>
+                    <span class="result-severity severity-note">note</span>
+                </div>
+                <div class="result-message">Do not hardcode credentials in code.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 src/java/conexion/ConexionDB.java</div>
+                    <div class="location-line">📍 Línea 10</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item note">
+                <div class="result-header">
+                    <div class="result-title">#3: java/NoHardcodedCredentials</div>
+                    <span class="result-severity severity-note">note</span>
+                </div>
+                <div class="result-message">Do not hardcode credentials in code.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 src/java/conexion/ConexionDB.java</div>
+                    <div class="location-line">📍 Línea 11</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#4: java/ReturnsPassword</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">An attacker might be able to detect the value of the password due to the exposure of comparison timing. When the functions Arrays.equals() or String.equals() are called, they will exit earlier if fewer bytes are matched. Use password encoder such as BCrypt for comparing passwords.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 src/java/negocio/UsuarioNegocio.java</div>
+                    <div class="location-line">📍 Línea 373</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#5: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 384</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#6: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 384</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#7: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 461</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#8: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 466</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#9: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 468</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#10: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 471</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#11: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 472</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#12: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 494</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#13: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 495</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#14: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 498</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#15: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 501</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#16: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 930</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#17: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 933</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#18: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 940</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#19: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 957</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#20: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 962</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#21: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 388</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#22: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 389</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#23: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 405</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#24: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 413</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#25: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 420</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#26: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 423</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#27: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 426</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#28: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 429</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#29: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 384</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#30: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 384</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#31: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 461</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#32: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 466</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#33: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 468</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#34: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 471</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#35: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 472</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#36: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 494</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#37: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 495</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#38: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 498</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#39: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 501</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#40: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 930</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#41: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 933</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#42: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 940</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#43: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 957</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#44: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/menu_coordinador.jsp</div>
+                    <div class="location-line">📍 Línea 962</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#45: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 388</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#46: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 389</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#47: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 405</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#48: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 413</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#49: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 420</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#50: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 423</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#51: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 426</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#52: java/XSS</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Unsanitized input from a database flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/estudiantes/certificados.jsp</div>
+                    <div class="location-line">📍 Línea 429</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#53: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 434</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#54: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 446</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#55: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 462</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#56: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 472</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#57: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 482</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#58: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 500</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#59: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 511</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#60: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 build/web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 528</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#61: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 434</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#62: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 446</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#63: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 462</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#64: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 472</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#65: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 482</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#66: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 500</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#67: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 511</div>
+                </div>
+                
+            </div>
+            
+            <div class="result-item error">
+                <div class="result-header">
+                    <div class="result-title">#68: java/XSS</div>
+                    <span class="result-severity severity-error">error</span>
+                </div>
+                <div class="result-message">Unsanitized input from an HTTP parameter flows into print, where it is used to render an HTML page returned to the user. This may result in a Cross-Site Scripting attack (XSS).</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 web/coordinador/crear_campana.jsp</div>
+                    <div class="location-line">📍 Línea 528</div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <div class="footer">
+            <p>Reportes generados automáticamente por GitHub Actions</p>
+            <p>Universidad Privada de Tacna - FAING EPIS</p>
+        </div>
+    </div>
+</body>
+</html>
+    

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semgrep Security Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            color: #666;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .note { color: #17a2b8; }
+        .results {
+            padding: 30px;
+        }
+        .result-item {
+            background: #f8f9fa;
+            border-left: 4px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .result-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        .result-item.error {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        .result-item.warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+        .result-item.note {
+            border-left-color: #17a2b8;
+            background: #f0f9ff;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .result-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .result-severity {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .severity-error {
+            background: #dc3545;
+            color: white;
+        }
+        .severity-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .severity-note {
+            background: #17a2b8;
+            color: white;
+        }
+        .result-message {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .result-location {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        .location-path {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .location-line {
+            color: #666;
+        }
+        .code-snippet {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .back-button {
+            display: inline-block;
+            margin: 20px;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        .back-button:hover {
+            background: #764ba2;
+        }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #28a745;
+            font-size: 1.5em;
+        }
+        .no-results svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Semgrep Security Report</h1>
+            <p>Sistema de Voluntariado UPT - Análisis de Seguridad</p>
+            <p>Generado: 2025-12-05 11:05:51 UTC</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number error">0</div>
+                <div class="stat-label">Errores Críticos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number warning">23</div>
+                <div class="stat-label">Advertencias</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number note">0</div>
+                <div class="stat-label">Notas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">23</div>
+                <div class="stat-label">Total Issues</div>
+            </div>
+        </div>
+        
+        <a href="../index.html" class="back-button">← Volver al Dashboard</a>
+        
+        <div class="results">
+
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#1: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 49</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Action: " + action);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#2: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 54</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Error: Acción no válida: " + action);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#3: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 81</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("QR Data recibido: " + qrData);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#4: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 92</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Error: Formato QR inválido. Partes: " + qrParts.length);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#5: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 94</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Primera parte: " + qrParts[0]);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#6: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 104</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Datos parseados - Estudiante: " + idEstudiante + ", Campaña: " + idCampana + ", Timestamp: " + timestamp);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#7: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 109</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Error: Inscripción no encontrada para estudiante " + idEstudiante + " en campaña " + idCampana);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#8: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 114</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("ID Inscripción encontrado: " + idInscripcion);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#9: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/AsistenciaServlet.java</div>
+                    <div class="location-line">📍 Línea 143</div>
+                </div>
+                
+                    <div class="code-snippet">out.print(jsonResponse);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#10: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/CertificadoServlet.java</div>
+                    <div class="location-line">📍 Línea 57</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Action: " + action);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#11: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/CertificadoServlet.java</div>
+                    <div class="location-line">📍 Línea 64</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Error: Acción no válida: " + action);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#12: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/CertificadoServlet.java</div>
+                    <div class="location-line">📍 Línea 88</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Parámetros - Estudiante: " + idEstudianteStr + 
+                             ", Campaña: " + idCampanaStr + 
+                             ", Horas: " + horasAcreditadasStr);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#13: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/CertificadoServlet.java</div>
+                    <div class="location-line">📍 Línea 140</div>
+                </div>
+                
+                    <div class="code-snippet">out.print(jsonResponse);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#14: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 69</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Action: " + action);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#15: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 74</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Error: Acción no válida: " + action);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#16: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 96</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Query String: " + request.getQueryString());</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#17: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 106</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Parámetro: '" + paramName + "' = '" + paramValue + "'");</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#18: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 117</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Parámetros específicos - idCampana: '" + idCampanaStr + "', idUsuario: '" + idUsuarioStr + "'");</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#19: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 130</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Parámetros parseados - idCampana: " + idCampana + ", idUsuario: " + idUsuario);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#20: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 141</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("¿Está inscrito? " + estaInscrito);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#21: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 152</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Datos del QR: " + qrData);</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#22: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 179</div>
+                </div>
+                
+                    <div class="code-snippet">System.out.println("Respuesta JSON preparada, longitud: " + jsonResponse.length());</div>
+                    
+            </div>
+            
+            <div class="result-item warning">
+                <div class="result-header">
+                    <div class="result-title">#23: java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer</div>
+                    <span class="result-severity severity-warning">warning</span>
+                </div>
+                <div class="result-message">Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views.</div>
+                
+                <div class="result-location">
+                    <div class="location-path">📁 proyecto/src/java/servlet/QRCodeServlet.java</div>
+                    <div class="location-line">📍 Línea 180</div>
+                </div>
+                
+                    <div class="code-snippet">out.print(jsonResponse);</div>
+                    
+            </div>
+            
+        </div>
+        
+        <div class="footer">
+            <p>Reportes generados automáticamente por GitHub Actions</p>
+            <p>Universidad Privada de Tacna - FAING EPIS</p>
+        </div>
+    </div>
+</body>
+</html>
+    
