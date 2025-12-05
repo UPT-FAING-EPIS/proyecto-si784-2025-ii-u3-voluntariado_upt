@@ -52,11 +52,14 @@ Publicar automáticamente los reportes de análisis de seguridad generados por *
         │  │   ├── index.html                         │
         │  │   ├── semgrep-results.sarif              │
         │  │   └── semgrep-results.json               │
-        │  └── snyk/                                  │
-        │      ├── code.html                          │
-        │      ├── dependencies.html                  │
-        │      ├── snyk-code-results.sarif            │
-        │      └── snyk-test-results.json             │
+        │  ├── snyk/                                  │
+        │  │   ├── code.html                          │
+        │  │   ├── dependencies.html                  │
+        │  │   ├── snyk-code-results.sarif            │
+        │  │   └── snyk-test-results.json             │
+        │  └── pitest/                                │
+        │      ├── index.html                         │
+        │      └── (reportes HTML de mutación)        │
         └─────────────────────────────────────────────┘
                               ↓
         ┌─────────────────────────────────────────────┐
@@ -90,11 +93,13 @@ Publicar automáticamente los reportes de análisis de seguridad generados por *
 - **Semgrep Report**: Issues de seguridad con location, línea, snippet de código
 - **Snyk Code Report**: Vulnerabilidades en código con severidad y descripción
 - **Snyk Dependencies Report**: CVEs en dependencias con package info
+- **PITest Report**: Reportes de mutation testing con mutation score, mutantes generados y eliminados
 
 ### 3. **Múltiples Formatos de Salida**
 - **HTML**: Visualización en navegador con estilos profesionales
-- **SARIF**: Formato estándar para integración con herramientas
+- **SARIF**: Formato estándar para integración con herramientas (Semgrep, Snyk)
 - **JSON**: Datos estructurados para procesamiento programático
+- **XML**: Reportes de PITest en formato XML para integración con CI/CD
 
 ### 4. **Actualización Automática**
 - **Después de CI/CD**: Se ejecuta automáticamente cuando el workflow "Complete Test Suite" termina
@@ -189,6 +194,11 @@ https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk
 **Snyk Dependencies:**
 ```
 https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/dependencies.html
+```
+
+**PITest Mutation Testing:**
+```
+https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/pitest/
 ```
 
 ### Archivos SARIF/JSON

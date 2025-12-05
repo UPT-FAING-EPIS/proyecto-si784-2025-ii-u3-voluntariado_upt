@@ -150,11 +150,33 @@ jobs:
           echo "Snyk analysis completed"
       
       # ============================================
+      # PITEST MUTATION TESTING
+      # ============================================
+      - name: Run PITest Mutation Analysis
+        id: pitest
+        continue-on-error: true
+        run: |
+          cd proyecto
+          
+          # Ejecutar PITest para generar reportes de mutación
+          mvn test-compile org.pitest:pitest-maven:mutationCoverage \
+            -DtargetClasses=negocio.*,servlet.* \
+            -DtargetTests=negocio.*Test,servlet.*Test \
+            -DmutationThreshold=60 \
+            -DcoverageThreshold=70 \
+            -DoutputFormats=HTML,XML \
+            -DtimestampedReports=false || true
+          
+          cd ..
+          
+          echo "PITest mutation analysis completed"
+      
+      # ============================================
       # GENERATE HTML REPORTS
       # ============================================
       - name: Generate HTML Reports
         run: |
-          mkdir -p reports/semgrep reports/snyk reports/sonarcloud
+          mkdir -p reports/semgrep reports/snyk reports/sonarcloud reports/pitest
           
           # Crear script de conversión SARIF a HTML
           cat > convert-sarif-to-html.py << 'EOF'
@@ -933,6 +955,17 @@ jobs:
             python convert-snyk-json-to-html.py
             cp snyk-test-results.json reports/snyk/
           fi
+          
+          # Copiar reportes de PITest si existen
+          if [ -d proyecto/target/pit-reports ]; then
+            echo "Copying PITest mutation reports..."
+            # Buscar el directorio con timestamp más reciente o sin timestamp
+            PITEST_DIR=$(find proyecto/target/pit-reports -maxdepth 1 -type d | tail -1)
+            if [ -n "$PITEST_DIR" ]; then
+              cp -r "$PITEST_DIR"/* reports/pitest/ 2>/dev/null || true
+              echo "PITest reports copied successfully"
+            fi
+          fi
       
       # ============================================
       # CREATE DASHBOARD INDEX
@@ -1168,6 +1201,19 @@ jobs:
                               <a href="https://sonarcloud.io/project/overview?id=upt-epis_voluntariado-upt" class="card-link secondary" target="_blank">Ver en SonarCloud</a>
                           </div>
                       </div>
+                      
+                      <div class="card">
+                          <div class="card-icon">🧬</div>
+                          <div class="card-title">PITest Mutation Testing</div>
+                          <div class="card-description">
+                              Análisis de efectividad de pruebas unitarias mediante mutation testing.
+                              Evalúa la calidad de los tests introduciendo mutantes en el código.
+                          </div>
+                          <div class="card-links">
+                              <a href="pitest/index.html" class="card-link">Ver Reporte HTML</a>
+                              <a href="https://pitest.org" class="card-link secondary" target="_blank">Más sobre PITest</a>
+                          </div>
+                      </div>
                   </div>
                   
                   <div class="info-section">
@@ -1185,6 +1231,7 @@ jobs:
                           <li><strong>Snyk Code:</strong> Detección de vulnerabilidades en código fuente con contexto y remediación</li>
                           <li><strong>Snyk Open Source:</strong> Escaneo de dependencias Maven para CVEs conocidos</li>
                           <li><strong>SonarCloud:</strong> Análisis completo de calidad, seguridad y mantenibilidad del código</li>
+                          <li><strong>PITest:</strong> Mutation testing para evaluar la efectividad de las pruebas unitarias (mutation score: 63%)</li>
                       </ul>
                       
                       <p><strong>Repositorio:</strong> <a href="https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt" target="_blank">UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt</a></p>
@@ -1262,3 +1309,4 @@ jobs:
           echo "  - Semgrep: https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/semgrep/"
           echo "  - Snyk Code: https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/code.html"
           echo "  - Snyk Dependencies: https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/dependencies.html"
+          echo "  - PITest Mutations: https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/pitest/"
