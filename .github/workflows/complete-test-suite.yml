@@ -61,12 +61,6 @@ jobs:
         if: matrix.tool == 'sonarqube'
         uses: warchant/setup-sonar-scanner@v7
       
-      - name: 🏗️ Build Project with Ant
-        if: matrix.tool == 'sonarqube'
-        run: |
-          cd proyecto
-          ant clean compile
-      
       - name: 🔍 Run SonarQube Analysis
         if: matrix.tool == 'sonarqube'
         env:
@@ -75,8 +69,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           sonar-scanner \
+            -Dsonar.projectKey=voluntariado-upt \
+            -Dsonar.organization=upt-epis \
+            -Dsonar.sources=proyecto/src/java \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.sourceEncoding=UTF-8 \
+            -Dsonar.java.source=17 \
+            -Dsonar.exclusions=**/test/**,**/lib/**,proyecto/web/**
       
       - name: 📊 SonarQube Quality Gate Check
         if: matrix.tool == 'sonarqube'
