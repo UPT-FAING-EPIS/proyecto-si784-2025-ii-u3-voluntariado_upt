@@ -150,26 +150,28 @@ jobs:
           echo "Snyk analysis completed"
       
       # ============================================
-      # PITEST MUTATION TESTING
+      # DOWNLOAD PITEST MUTATION REPORTS
       # ============================================
-      - name: Run PITest Mutation Analysis
+      - name: Download PITest Mutation Reports
         id: pitest
         continue-on-error: true
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: complete-test-suite.yml
+          name: mutation-test-results
+          path: pitest-reports/
+          if_no_artifact_found: warn
+      
+      - name: List downloaded PITest artifacts
+        continue-on-error: true
         run: |
-          cd proyecto
-          
-          # Ejecutar PITest para generar reportes de mutación
-          mvn test-compile org.pitest:pitest-maven:mutationCoverage \
-            -DtargetClasses=negocio.*,servlet.* \
-            -DtargetTests=negocio.*Test,servlet.*Test \
-            -DmutationThreshold=60 \
-            -DcoverageThreshold=70 \
-            -DoutputFormats=HTML,XML \
-            -DtimestampedReports=false || true
-          
-          cd ..
-          
-          echo "PITest mutation analysis completed"
+          echo "Checking for PITest reports..."
+          if [ -d pitest-reports ]; then
+            ls -la pitest-reports/
+            find pitest-reports -type f -name "*.html" | head -5
+          else
+            echo "No PITest reports found - artifact may not exist yet"
+          fi
       
       # ============================================
       # GENERATE HTML REPORTS
@@ -956,15 +958,81 @@ jobs:
             cp snyk-test-results.json reports/snyk/
           fi
           
-          # Copiar reportes de PITest si existen
-          if [ -d proyecto/target/pit-reports ]; then
-            echo "Copying PITest mutation reports..."
-            # Buscar el directorio con timestamp más reciente o sin timestamp
-            PITEST_DIR=$(find proyecto/target/pit-reports -maxdepth 1 -type d | tail -1)
-            if [ -n "$PITEST_DIR" ]; then
-              cp -r "$PITEST_DIR"/* reports/pitest/ 2>/dev/null || true
-              echo "PITest reports copied successfully"
+          # Copiar reportes de PITest desde artefactos descargados
+          if [ -d pitest-reports ]; then
+            echo "Copying PITest mutation reports from downloaded artifacts..."
+            # Buscar archivos HTML dentro del directorio descargado
+            find pitest-reports -name "*.html" -o -name "*.css" -o -name "*.js" | while read file; do
+              cp "$file" reports/pitest/ 2>/dev/null || true
+            done
+            # También copiar toda la estructura si existe
+            if [ -d pitest-reports/pit-reports ]; then
+              cp -r pitest-reports/pit-reports/* reports/pitest/ 2>/dev/null || true
             fi
+            # Si los archivos están directamente en pitest-reports
+            cp -r pitest-reports/* reports/pitest/ 2>/dev/null || true
+            
+            echo "PITest reports copied. Contents:"
+            ls -la reports/pitest/ || echo "No files in reports/pitest/"
+          else
+            echo "⚠️ No PITest reports downloaded - creating placeholder"
+            cat > reports/pitest/index.html << 'PITESTPLACEHOLDER'
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+              <meta charset="UTF-8">
+              <title>PITest Reports - Not Available</title>
+              <style>
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      min-height: 100vh;
+                      margin: 0;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  }
+                  .container {
+                      background: white;
+                      padding: 40px;
+                      border-radius: 12px;
+                      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                      text-align: center;
+                      max-width: 600px;
+                  }
+                  h1 { color: #2c3e50; margin-bottom: 20px; }
+                  p { color: #666; line-height: 1.6; margin-bottom: 15px; }
+                  .icon { font-size: 4em; margin-bottom: 20px; }
+                  a {
+                      display: inline-block;
+                      margin-top: 20px;
+                      padding: 12px 24px;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      text-decoration: none;
+                      border-radius: 6px;
+                      transition: opacity 0.3s;
+                  }
+                  a:hover { opacity: 0.9; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="icon">🧬</div>
+                  <h1>PITest Mutation Reports</h1>
+                  <p><strong>Los reportes de mutation testing aún no están disponibles.</strong></p>
+                  <p>Para generar los reportes:</p>
+                  <ol style="text-align: left; display: inline-block;">
+                      <li>Ejecuta el workflow "Complete Test Suite"</li>
+                      <li>Espera a que complete las pruebas de mutación</li>
+                      <li>Este reporte se actualizará automáticamente</li>
+                  </ol>
+                  <p><small>Los reportes se generan con PITest y muestran el mutation score del proyecto.</small></p>
+                  <a href="../">← Volver al Dashboard</a>
+              </div>
+          </body>
+          </html>
+          PITESTPLACEHOLDER
           fi
       
       # ============================================
