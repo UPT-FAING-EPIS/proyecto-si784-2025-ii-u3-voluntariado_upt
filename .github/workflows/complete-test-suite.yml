@@ -48,22 +48,11 @@ jobs:
         with:
           fetch-depth: 0  # Full history for SonarQube
       
-      - name: 🔍 Debug - List files
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "Listing repository contents:"
-          ls -la
-          echo "Looking for pom.xml files:"
-          find . -name "pom.xml" -type f
-      
       - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
-          cache: maven
-          cache-dependency-path: '**/pom.xml'
       
       # ─────────────────────────────────────────────────────────
       # SONARQUBE ANALYSIS
@@ -167,8 +156,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
-          cache: maven
-          cache-dependency-path: '**/pom.xml'
       
       - name: 🧪 Run Unit Tests with JaCoCo Coverage
         run: |
@@ -238,8 +225,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
-          cache: maven
-          cache-dependency-path: '**/pom.xml'
       
       - name: 🧬 Run PITest Mutation Analysis
         run: |
@@ -294,8 +279,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
-          cache: maven
-          cache-dependency-path: '**/pom.xml'
       
       - name: 🗄️ Initialize Test Database
         run: |
@@ -365,8 +348,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
-          cache: maven
-          cache-dependency-path: '**/pom.xml'
       
       - name: 🌐 Setup Chrome
         if: matrix.browser == 'chrome'
@@ -467,8 +448,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
-          cache: maven
-          cache-dependency-path: '**/pom.xml'
       
       - name: 🌐 Setup Chrome
         uses: browser-actions/setup-chrome@v1
