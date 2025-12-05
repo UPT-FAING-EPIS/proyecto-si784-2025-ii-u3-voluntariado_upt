@@ -89,6 +89,32 @@ jobs:
           echo "Semgrep analysis completed"
       
       # ============================================
+      # SONARCLOUD ANALYSIS
+      # ============================================
+      - name: Run SonarCloud Analysis
+        id: sonarcloud
+        continue-on-error: true
+        uses: SonarSource/sonarcloud-github-action@v3
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      
+      - name: Wait for SonarCloud Processing
+        run: sleep 30
+      
+      - name: Download SonarCloud Results
+        continue-on-error: true
+        run: |
+          # Obtener los issues de SonarCloud vía API
+          curl -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/issues/search?componentKeys=upt-epis_voluntariado-upt&ps=500" \
+            -o sonarcloud-issues.json
+          
+          # Obtener medidas del proyecto
+          curl -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/measures/component?component=upt-epis_voluntariado-upt&metricKeys=bugs,vulnerabilities,code_smells,security_hotspots,coverage,duplicated_lines_density,ncloc,sqale_index,reliability_rating,security_rating,sqale_rating" \
+            -o sonarcloud-measures.json
+      
+      # ============================================
       # SNYK ANALYSIS
       # ============================================
       - name: Run Snyk Analysis
@@ -128,7 +154,7 @@ jobs:
       # ============================================
       - name: Generate HTML Reports
         run: |
-          mkdir -p reports/semgrep reports/snyk
+          mkdir -p reports/semgrep reports/snyk reports/sonarcloud
           
           # Crear script de conversión SARIF a HTML
           cat > convert-sarif-to-html.py << 'EOF'
@@ -469,6 +495,220 @@ jobs:
           if [ -f snyk-code-results.sarif ]; then
             python convert-sarif-to-html.py snyk-code-results.sarif reports/snyk/code.html "Snyk Code"
             cp snyk-code-results.sarif reports/snyk/
+          fi
+          
+          # Generar reporte HTML de SonarCloud desde JSON
+          if [ -f sonarcloud-issues.json ] && [ -f sonarcloud-measures.json ]; then
+            cat > convert-sonarcloud-to-html.py << 'EOFSONAR'
+          import json
+          from datetime import datetime
+          
+          # Leer datos de SonarCloud
+          with open('sonarcloud-issues.json', 'r', encoding='utf-8') as f:
+              issues_data = json.load(f)
+          
+          with open('sonarcloud-measures.json', 'r', encoding='utf-8') as f:
+              measures_data = json.load(f)
+          
+          issues = issues_data.get('issues', [])
+          measures = {m['metric']: m.get('value', '0') for m in measures_data.get('component', {}).get('measures', [])}
+          
+          # Contar por tipo y severidad
+          type_counts = {}
+          severity_counts = {'BLOCKER': 0, 'CRITICAL': 0, 'MAJOR': 0, 'MINOR': 0, 'INFO': 0}
+          
+          for issue in issues:
+              issue_type = issue.get('type', 'UNKNOWN')
+              severity = issue.get('severity', 'INFO')
+              type_counts[issue_type] = type_counts.get(issue_type, 0) + 1
+              severity_counts[severity] = severity_counts.get(severity, 0) + 1
+          
+          html = f'''<!DOCTYPE html>
+          <html lang="es">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>SonarCloud Analysis Report</title>
+              <style>
+                  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                  body {{
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                      background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+                      padding: 20px;
+                      color: #333;
+                  }}
+                  .container {{
+                      max-width: 1400px;
+                      margin: 0 auto;
+                      background: white;
+                      border-radius: 12px;
+                      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                      overflow: hidden;
+                  }}
+                  .header {{
+                      background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+                      color: white;
+                      padding: 40px;
+                      text-align: center;
+                  }}
+                  .header h1 {{ font-size: 2.5em; margin-bottom: 10px; }}
+                  .stats {{
+                      display: grid;
+                      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                      gap: 20px;
+                      padding: 30px;
+                      background: #f8f9fa;
+                  }}
+                  .stat-card {{
+                      background: white;
+                      padding: 25px;
+                      border-radius: 8px;
+                      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                      text-align: center;
+                  }}
+                  .stat-number {{ font-size: 2.5em; font-weight: bold; margin-bottom: 10px; }}
+                  .stat-label {{ color: #666; font-size: 0.95em; text-transform: uppercase; }}
+                  .blocker {{ color: #d32f2f; }}
+                  .critical {{ color: #f44336; }}
+                  .major {{ color: #ff9800; }}
+                  .minor {{ color: #ffc107; }}
+                  .info {{ color: #2196f3; }}
+                  .issues-list {{
+                      padding: 30px;
+                  }}
+                  .issue-card {{
+                      background: #f8f9fa;
+                      padding: 20px;
+                      margin-bottom: 15px;
+                      border-radius: 8px;
+                      border-left: 4px solid #666;
+                  }}
+                  .issue-card.blocker {{ border-left-color: #d32f2f; }}
+                  .issue-card.critical {{ border-left-color: #f44336; }}
+                  .issue-card.major {{ border-left-color: #ff9800; }}
+                  .issue-card.minor {{ border-left-color: #ffc107; }}
+                  .issue-card.info {{ border-left-color: #2196f3; }}
+                  .issue-severity {{
+                      display: inline-block;
+                      padding: 4px 12px;
+                      border-radius: 4px;
+                      font-size: 0.85em;
+                      font-weight: bold;
+                      margin-right: 10px;
+                  }}
+                  .footer {{
+                      background: #f8f9fa;
+                      padding: 20px;
+                      text-align: center;
+                      color: #666;
+                  }}
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="header">
+                      <h1>🔍 SonarCloud Analysis Report</h1>
+                      <p>Generated on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+                      <p><a href="https://sonarcloud.io/project/overview?id=upt-epis_voluntariado-upt" style="color: white; text-decoration: underline;">Ver en SonarCloud</a></p>
+                  </div>
+                  
+                  <div class="stats">
+                      <div class="stat-card">
+                          <div class="stat-number">{measures.get('bugs', '0')}</div>
+                          <div class="stat-label">Bugs</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number">{measures.get('vulnerabilities', '0')}</div>
+                          <div class="stat-label">Vulnerabilities</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number">{measures.get('code_smells', '0')}</div>
+                          <div class="stat-label">Code Smells</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number">{measures.get('security_hotspots', '0')}</div>
+                          <div class="stat-label">Security Hotspots</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number">{measures.get('ncloc', 'N/A')}</div>
+                          <div class="stat-label">Lines of Code</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number">{measures.get('duplicated_lines_density', '0')}%</div>
+                          <div class="stat-label">Duplicated Lines</div>
+                      </div>
+                  </div>
+                  
+                  <div class="stats">
+                      <div class="stat-card">
+                          <div class="stat-number blocker">{severity_counts['BLOCKER']}</div>
+                          <div class="stat-label">Blocker</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number critical">{severity_counts['CRITICAL']}</div>
+                          <div class="stat-label">Critical</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number major">{severity_counts['MAJOR']}</div>
+                          <div class="stat-label">Major</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number minor">{severity_counts['MINOR']}</div>
+                          <div class="stat-label">Minor</div>
+                      </div>
+                      <div class="stat-card">
+                          <div class="stat-number info">{severity_counts['INFO']}</div>
+                          <div class="stat-label">Info</div>
+                      </div>
+                  </div>
+                  
+                  <div class="issues-list">
+                      <h2 style="margin-bottom: 20px;">📋 Issues Encontrados ({len(issues)})</h2>
+          '''
+          
+          for issue in issues[:100]:  # Mostrar los primeros 100 issues
+              severity = issue.get('severity', 'INFO')
+              message = issue.get('message', 'No message')
+              component = issue.get('component', '').replace('upt-epis_voluntariado-upt:', '')
+              rule = issue.get('rule', '')
+              line = issue.get('line', 'N/A')
+              
+              html += f'''
+                      <div class="issue-card {severity.lower()}">
+                          <div>
+                              <span class="issue-severity" style="background: {'#d32f2f' if severity == 'BLOCKER' else '#f44336' if severity == 'CRITICAL' else '#ff9800' if severity == 'MAJOR' else '#ffc107' if severity == 'MINOR' else '#2196f3'}; color: white;">{severity}</span>
+                              <strong>{issue.get('type', 'UNKNOWN')}</strong>
+                          </div>
+                          <p style="margin: 10px 0;"><strong>{message}</strong></p>
+                          <p style="color: #666; font-size: 0.9em;">
+                              📄 {component} • Line {line}<br>
+                              🔧 Rule: {rule}
+                          </p>
+                      </div>
+          '''
+          
+          if len(issues) > 100:
+              html += f'<p style="text-align: center; color: #666; padding: 20px;">Y {len(issues) - 100} issues más... <a href="https://sonarcloud.io/project/issues?id=upt-epis_voluntariado-upt">Ver todos en SonarCloud</a></p>'
+          
+          html += '''
+                  </div>
+                  
+                  <div class="footer">
+                      <p>Generated by SonarCloud Analysis • Sistema Voluntariado UPT</p>
+                  </div>
+              </div>
+          </body>
+          </html>
+          '''
+          
+          with open('reports/sonarcloud/index.html', 'w', encoding='utf-8') as f:
+              f.write(html)
+          
+          print("SonarCloud HTML report generated successfully")
+          EOFSONAR
+            
+            python convert-sonarcloud-to-html.py
+            cp sonarcloud-*.json reports/sonarcloud/
           fi
           
           # Generar reporte HTML de Snyk Test desde JSON
@@ -915,6 +1155,19 @@ jobs:
                               <a href="snyk/snyk-test-results.json" class="card-link secondary">Descargar JSON</a>
                           </div>
                       </div>
+                      
+                      <div class="card">
+                          <div class="card-icon">☁️</div>
+                          <div class="card-title">SonarCloud Analysis</div>
+                          <div class="card-description">
+                              Análisis completo de calidad y seguridad del código con detección de 
+                              bugs, vulnerabilidades, code smells y security hotspots.
+                          </div>
+                          <div class="card-links">
+                              <a href="sonarcloud/index.html" class="card-link">Ver Reporte HTML</a>
+                              <a href="https://sonarcloud.io/project/overview?id=upt-epis_voluntariado-upt" class="card-link secondary" target="_blank">Ver en SonarCloud</a>
+                          </div>
+                      </div>
                   </div>
                   
                   <div class="info-section">
@@ -931,6 +1184,7 @@ jobs:
                           <li><strong>Semgrep:</strong> Análisis estático de código con reglas personalizables (OWASP, security-audit, java)</li>
                           <li><strong>Snyk Code:</strong> Detección de vulnerabilidades en código fuente con contexto y remediación</li>
                           <li><strong>Snyk Open Source:</strong> Escaneo de dependencias Maven para CVEs conocidos</li>
+                          <li><strong>SonarCloud:</strong> Análisis completo de calidad, seguridad y mantenibilidad del código</li>
                       </ul>
                       
                       <p><strong>Repositorio:</strong> <a href="https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt" target="_blank">UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt</a></p>

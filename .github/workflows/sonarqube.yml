@@ -5,6 +5,8 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
 jobs:
   sonarqube:
     name: SonarQube
@@ -13,8 +15,32 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v3
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      
+      - name: Wait for SonarCloud Processing
+        run: sleep 30
+      
+      - name: Download SonarCloud Results
+        continue-on-error: true
+        run: |
+          # Obtener los issues de SonarCloud vía API
+          curl -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/issues/search?componentKeys=upt-epis_voluntariado-upt&ps=500" \
+            -o sonarcloud-issues.json
+          
+          # Obtener medidas del proyecto
+          curl -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/measures/component?component=upt-epis_voluntariado-upt&metricKeys=bugs,vulnerabilities,code_smells,security_hotspots,coverage,duplicated_lines_density" \
+            -o sonarcloud-measures.json
+      
+      - name: Upload SonarCloud Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sonarcloud-results
+          path: |
+            sonarcloud-*.json
