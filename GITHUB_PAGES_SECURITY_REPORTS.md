@@ -57,9 +57,13 @@ Publicar automáticamente los reportes de análisis de seguridad generados por *
         │  │   ├── dependencies.html                  │
         │  │   ├── snyk-code-results.sarif            │
         │  │   └── snyk-test-results.json             │
-        │  └── pitest/                                │
-        │      ├── index.html                         │
-        │      └── (reportes HTML de mutación)        │
+        │  ├── pitest/                                │
+        │  │   ├── index.html                         │
+        │  │   └── (reportes HTML de mutación)        │
+        │  └── bdd/                                   │
+        │      ├── index.html (Dashboard BDD)         │
+        │      ├── smoke/ (Smoke Tests)               │
+        │      └── regression/ (Regression Tests)     │
         └─────────────────────────────────────────────┘
                               ↓
         ┌─────────────────────────────────────────────┐
@@ -94,6 +98,7 @@ Publicar automáticamente los reportes de análisis de seguridad generados por *
 - **Snyk Code Report**: Vulnerabilidades en código con severidad y descripción
 - **Snyk Dependencies Report**: CVEs en dependencias con package info
 - **PITest Report**: Reportes de mutation testing con mutation score, mutantes generados y eliminados
+- **BDD Reports**: Reportes de Cucumber con escenarios Gherkin (Smoke Tests y Regression Tests)
 
 ### 3. **Múltiples Formatos de Salida**
 - **HTML**: Visualización en navegador con estilos profesionales
@@ -199,6 +204,13 @@ https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk
 **PITest Mutation Testing:**
 ```
 https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/pitest/
+```
+
+**BDD Tests (Cucumber):**
+```
+https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/bdd/
+https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/bdd/smoke/
+https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/bdd/regression/
 ```
 
 ### Archivos SARIF/JSON

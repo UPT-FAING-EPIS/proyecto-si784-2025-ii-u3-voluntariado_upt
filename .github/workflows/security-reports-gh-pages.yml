@@ -174,11 +174,48 @@ jobs:
           fi
       
       # ============================================
+      # DOWNLOAD BDD (CUCUMBER) REPORTS
+      # ============================================
+      - name: Download BDD Test Reports (Smoke)
+        id: bdd-smoke
+        continue-on-error: true
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: complete-test-suite.yml
+          name: bdd-test-results-smoke
+          path: bdd-reports/smoke/
+          if_no_artifact_found: warn
+      
+      - name: Download BDD Test Reports (Regression)
+        id: bdd-regression
+        continue-on-error: true
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: complete-test-suite.yml
+          name: bdd-test-results-regression
+          path: bdd-reports/regression/
+          if_no_artifact_found: warn
+      
+      - name: List downloaded BDD artifacts
+        continue-on-error: true
+        run: |
+          echo "Checking for BDD reports..."
+          if [ -d bdd-reports ]; then
+            echo "Smoke tests:"
+            ls -la bdd-reports/smoke/ || echo "No smoke reports"
+            echo "Regression tests:"
+            ls -la bdd-reports/regression/ || echo "No regression reports"
+            find bdd-reports -type f -name "*.html" | head -10
+          else
+            echo "No BDD reports found - artifact may not exist yet"
+          fi
+      
+      # ============================================
       # GENERATE HTML REPORTS
       # ============================================
       - name: Generate HTML Reports
         run: |
-          mkdir -p reports/semgrep reports/snyk reports/sonarcloud reports/pitest
+          mkdir -p reports/semgrep reports/snyk reports/sonarcloud reports/pitest reports/bdd
           
           # Crear script de conversión SARIF a HTML
           cat > convert-sarif-to-html.py << 'EOF'
@@ -1034,6 +1071,121 @@ jobs:
           </html>
           PITESTPLACEHOLDER
           fi
+          
+          # Copiar reportes de BDD (Cucumber) si existen
+          if [ -d bdd-reports ]; then
+            echo "Copying BDD (Cucumber) reports..."
+            
+            # Copiar reportes de smoke tests
+            if [ -d bdd-reports/smoke ]; then
+              mkdir -p reports/bdd/smoke
+              find bdd-reports/smoke -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.json" | while read file; do
+                cp "$file" reports/bdd/smoke/ 2>/dev/null || true
+              done
+              # Copiar estructura completa de cucumber-reports si existe
+              if [ -d bdd-reports/smoke/proyecto/target/cucumber-reports ]; then
+                cp -r bdd-reports/smoke/proyecto/target/cucumber-reports/* reports/bdd/smoke/ 2>/dev/null || true
+              fi
+            fi
+            
+            # Copiar reportes de regression tests
+            if [ -d bdd-reports/regression ]; then
+              mkdir -p reports/bdd/regression
+              find bdd-reports/regression -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.json" | while read file; do
+                cp "$file" reports/bdd/regression/ 2>/dev/null || true
+              done
+              # Copiar estructura completa de cucumber-reports si existe
+              if [ -d bdd-reports/regression/proyecto/target/cucumber-reports ]; then
+                cp -r bdd-reports/regression/proyecto/target/cucumber-reports/* reports/bdd/regression/ 2>/dev/null || true
+              fi
+            fi
+            
+            echo "BDD reports copied. Contents:"
+            ls -la reports/bdd/ || echo "No files in reports/bdd/"
+          else
+            echo "⚠️ No BDD reports downloaded - creating placeholder"
+            mkdir -p reports/bdd
+            cat > reports/bdd/index.html << 'BDDPLACEHOLDER'
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+              <meta charset="UTF-8">
+              <title>BDD Test Reports - Not Available</title>
+              <style>
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      min-height: 100vh;
+                      margin: 0;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  }
+                  .container {
+                      background: white;
+                      padding: 40px;
+                      border-radius: 12px;
+                      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                      text-align: center;
+                      max-width: 600px;
+                  }
+                  h1 { color: #2c3e50; margin-bottom: 20px; }
+                  p { color: #666; line-height: 1.6; margin-bottom: 15px; }
+                  .icon { font-size: 4em; margin-bottom: 20px; }
+                  a {
+                      display: inline-block;
+                      margin-top: 20px;
+                      padding: 12px 24px;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      text-decoration: none;
+                      border-radius: 6px;
+                      transition: opacity 0.3s;
+                  }
+                  a:hover { opacity: 0.9; }
+                  .suite-links {
+                      display: flex;
+                      gap: 15px;
+                      justify-content: center;
+                      margin-top: 20px;
+                  }
+                  .suite-link {
+                      padding: 10px 20px;
+                      background: #f8f9fa;
+                      color: #667eea;
+                      border: 2px solid #667eea;
+                      text-decoration: none;
+                      border-radius: 6px;
+                      transition: all 0.3s;
+                  }
+                  .suite-link:hover {
+                      background: #667eea;
+                      color: white;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="icon">🥒</div>
+                  <h1>BDD Test Reports (Cucumber)</h1>
+                  <p><strong>Los reportes de pruebas BDD aún no están disponibles.</strong></p>
+                  <p>Para generar los reportes:</p>
+                  <ol style="text-align: left; display: inline-block;">
+                      <li>Ejecuta el workflow "Complete Test Suite"</li>
+                      <li>Espera a que complete las pruebas BDD (Smoke y Regression)</li>
+                      <li>Este reporte se actualizará automáticamente</li>
+                  </ol>
+                  <p><small>Los reportes se generan con Cucumber en formato Gherkin y muestran los escenarios ejecutados.</small></p>
+                  <div class="suite-links">
+                      <a href="smoke/" class="suite-link">Smoke Tests</a>
+                      <a href="regression/" class="suite-link">Regression Tests</a>
+                  </div>
+                  <a href="../">← Volver al Dashboard</a>
+              </div>
+          </body>
+          </html>
+          BDDPLACEHOLDER
+          fi
       
       # ============================================
       # CREATE DASHBOARD INDEX
@@ -1282,6 +1434,20 @@ jobs:
                               <a href="https://pitest.org" class="card-link secondary" target="_blank">Más sobre PITest</a>
                           </div>
                       </div>
+                      
+                      <div class="card">
+                          <div class="card-icon">🥒</div>
+                          <div class="card-title">BDD Tests (Cucumber)</div>
+                          <div class="card-description">
+                              Pruebas de comportamiento escritas en Gherkin que validan funcionalidades
+                              desde la perspectiva del usuario final (Smoke y Regression).
+                          </div>
+                          <div class="card-links">
+                              <a href="bdd/index.html" class="card-link">Ver Dashboard BDD</a>
+                              <a href="bdd/smoke/" class="card-link secondary">Smoke Tests</a>
+                              <a href="bdd/regression/" class="card-link secondary">Regression Tests</a>
+                          </div>
+                      </div>
                   </div>
                   
                   <div class="info-section">
@@ -1300,6 +1466,7 @@ jobs:
                           <li><strong>Snyk Open Source:</strong> Escaneo de dependencias Maven para CVEs conocidos</li>
                           <li><strong>SonarCloud:</strong> Análisis completo de calidad, seguridad y mantenibilidad del código</li>
                           <li><strong>PITest:</strong> Mutation testing para evaluar la efectividad de las pruebas unitarias (mutation score: 63%)</li>
+                          <li><strong>Cucumber:</strong> Pruebas BDD con escenarios en formato Gherkin (Smoke Tests y Regression Tests)</li>
                       </ul>
                       
                       <p><strong>Repositorio:</strong> <a href="https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt" target="_blank">UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt</a></p>
@@ -1378,3 +1545,4 @@ jobs:
           echo "  - Snyk Code: https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/code.html"
           echo "  - Snyk Dependencies: https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/snyk/dependencies.html"
           echo "  - PITest Mutations: https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/pitest/"
+          echo "  - BDD Tests: https://upt-faing-epis.github.io/proyecto-si784-2025-ii-u3-voluntariado_upt/bdd/"
