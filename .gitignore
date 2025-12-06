@@ -1,0 +1,332 @@
+# ==========================
+# Java
+# ==========================
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# ==========================
+# Maven
+# ==========================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ==========================
+# Gradle
+# ==========================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gradle-app.setting
+.gradletasknamecache
+
+# ==========================
+# IDEs
+# ==========================
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+nbactions.xml
+nb-configuration.xml
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.history/
+*.vsix
+
+# ==========================
+# Base de Datos
+# ==========================
+*.sql.backup
+*.sql.bak
+*.db
+*.sqlite
+*.sqlite3
+
+# Credenciales de BD (NUNCA COMMITEAR)
+**/conexion/Conexion.java.local
+**/config/database.properties
+**/config/db-credentials.properties
+
+# ==========================
+# Tomcat / Servidores
+# ==========================
+**/RUNNING.pid
+work/
+logs/
+temp/
+webapps/
+
+# ==========================
+# Tests
+# ==========================
+# Coverage
+*.exec
+jacoco.xml
+.coveralls.yml
+
+# PITest
+pit-reports/
+**/target/pit-reports/
+
+# Selenium
+*.log
+chromedriver.log
+geckodriver.log
+screenshots/
+test-output/
+
+# Test databases
+**/testdb/
+h2-test-db/
+
+# ==========================
+# Análisis Estático
+# ==========================
+# SonarQube
+.sonar/
+.scannerwork/
+
+# Semgrep
+.semgrep/
+semgrep-report.json
+semgrep-report.sarif
+
+# Snyk
+.snyk
+snyk-report.json
+
+# ==========================
+# CI/CD
+# ==========================
+# GitHub Actions artifacts
+.github/actions-runner/
+*.log
+
+# ==========================
+# OS
+# ==========================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ==========================
+# Archivos Temporales
+# ==========================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~.nib
+*.bak
+*.old
+
+# ==========================
+# Credenciales y Secretos
+# ==========================
+# NUNCA COMMITEAR ESTOS ARCHIVOS
+*.key
+*.pem
+*.p12
+*.pfx
+*.cer
+*.crt
+*.der
+credentials.json
+secrets.json
+*.env
+.env
+.env.local
+.env.*.local
+*.credentials
+
+# Archivos de configuración con secretos
+config/secrets.properties
+config/api-keys.properties
+src/main/resources/application-secrets.properties
+
+# Claves de servicios
+service-account.json
+firebase-adminsdk.json
+gcp-credentials.json
+aws-credentials.json
+
+# ==========================
+# Documentación Generada
+# ==========================
+**/target/apidocs/
+**/target/site/
+javadoc/
+
+# ==========================
+# Node (si se usa frontend)
+# ==========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ==========================
+# Terraform (si se usa IaC)
+# ==========================
+# Ver terraform/.gitignore para configuración específica
+
+# ==========================
+# Certificados PDF Generados (Temporal)
+# ==========================
+# Descomentar si no quieres versionar certificados generados
+# **/certificados/*.pdf
+# !**/certificados/.gitkeep
+
+# ==========================
+# QR Codes Generados (Temporal)
+# ==========================
+# Descomentar si no quieres versionar QR codes
+# **/qrcodes/*.png
+# !**/qrcodes/.gitkeep
+
+# ==========================
+# Uploads / Archivos Subidos
+# ==========================
+uploads/
+!uploads/.gitkeep
+images/uploaded/
+!images/uploaded/.gitkeep
+
+# ==========================
+# Backups
+# ==========================
+backup/
+backups/
+*.backup
+*.bkp
+
+# ==========================
+# Logs
+# ==========================
+*.log
+logs/
+!logs/.gitkeep
+
+# ==========================
+# Dependencias Locales
+# ==========================
+lib/local/
+lib/vendor/
+
+# ==========================
+# Archivos de Proyecto Personal
+# ==========================
+TODO.md
+NOTES.md
+*.personal
+
+# ==========================
+# Performance Profiling
+# ==========================
+*.hprof
+*.prof
+
+# ==========================
+# Kubernetes (si se usa)
+# ==========================
+*.kubeconfig
+kubeconfig.yaml
+**/k8s/secrets.yaml
+
+# ==========================
+# Docker (si se usa)
+# ==========================
+.dockerignore.local
+docker-compose.override.yml
+.docker/
+
+# ==========================
+# Cachés
+# ==========================
+.cache/
+*.cache
+
+# ==========================
+# Reportes de Tests
+# ==========================
+test-results/
+junit-reports/
+cucumber-reports/
+allure-results/
+allure-report/
+
+# ==========================
+# NO IGNORAR (Mantener)
+# ==========================
+# Asegurarse de NO ignorar estos
+!.gitignore
+!.github/
+!.mvn/wrapper/maven-wrapper.properties

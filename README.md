@@ -4,7 +4,14 @@
 
 ---
 
-## 🧩 Proyecto: *Implementación de Sistema de Voluntariado UPT*  
+## 🧩 Proyecto: *Implementación de Sistema de Voluntariado UPT*
+
+[![GitHub Release](https://img.shields.io/github/v/release/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt?style=flat-square&logo=github)](https://github.com/UPT-FAING-EPIS/proyecto-si784-2025-ii-u3-voluntariado_upt/releases)
+[![Java](https://img.shields.io/badge/Java-11%2B-orange?style=flat-square&logo=openjdk)](https://openjdk.org/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
+[![Code of Conduct](https://img.shields.io/badge/Code%20of%20Conduct-Contributor%20Covenant-violet?style=flat-square)](CODE_OF_CONDUCT.md)
+
 **Curso:** Calidad y Pruebas de Software  
 **Docente:** Ing. Mag. Patrick Jose Cuadros Quiroga  
 
@@ -194,8 +201,34 @@ El desarrollo del proyecto se sustenta en los siguientes documentos:
 
 ---
 
+## 🤝 Contribuciones
+
+¡Las contribuciones son bienvenidas! Este proyecto acepta contribuciones de la comunidad.
+
+### Cómo Contribuir
+
+1. 🍴 Haz un fork del proyecto
+2. 🔨 Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. 💾 Haz commit de tus cambios (`git commit -m 'feat: Add some AmazingFeature'`)
+4. 📤 Push a la rama (`git push origin feature/AmazingFeature`)
+5. 🔍 Abre un Pull Request
+
+Por favor, lee nuestra [Guía de Contribución](CONTRIBUTING.md) y nuestro [Código de Conducta](CODE_OF_CONDUCT.md) antes de contribuir.
+
+### ¿Necesitas ayuda?
+
+- 📖 Revisa la [documentación](README.md)
+- 🐛 [Reporta un bug](../../issues/new?template=bug_report.md)
+- 💡 [Sugiere una mejora](../../issues/new?template=feature_request.md)
+- 💬 Participa en [Discussions](../../discussions)
+
+---
+
 ## 📜 Licencia
-Este proyecto se distribuye bajo la licencia **MIT**, lo que permite su uso, modificación y distribución libre con fines académicos y educativos.  
+
+Este proyecto se distribuye bajo la licencia **MIT**, lo que permite su uso, modificación y distribución libre con fines académicos y educativos.
+
+Ver [LICENSE](LICENSE) para más información.  
 
 ---
 
