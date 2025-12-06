@@ -201,3 +201,5 @@ Este proyecto se distribuye bajo la licencia **MIT**, lo que permite su uso, mod
 
 > *“La tecnología no solo automatiza procesos, sino que potencia el compromiso social, la ética y la innovación dentro de la comunidad universitaria.”*  
 > — *Equipo Voluntariado-UPT (2025)*
+
+      Hola este es mi contribución - saludos.
