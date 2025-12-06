@@ -41,53 +41,11 @@ Integrantes:
 
 
 
-
-
-
-
-
-
-
-
-
 <a name="_heading=h.52nyfmm3yjan"></a>**Implementación de Sistema de Voluntariado UPT**
 
 **Diccionario de Datos**
 
 **Versión *1.0***
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -112,35 +70,6 @@ Integrantes:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 **Diccionario de Datos**
 
 
@@ -156,9 +85,6 @@ Integrantes:
 
 
 ![](Aspose.Words.8f25a3ab-1230-40da-9dce-479ae3ec161f.003.png)
-
-
-
 
 
 
